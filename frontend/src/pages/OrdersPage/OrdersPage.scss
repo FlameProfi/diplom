@@ -1,0 +1,7 @@
+.orders-page {
+  padding: 1rem;
+  .page-header { /* Как в Batches */ }
+  .order-form { /* Форма с grid */ }
+  .orders-table { /* Таблица как в Batches */ }
+  .status-new { background: yellow; } /* И т.д. для статусов */
+}

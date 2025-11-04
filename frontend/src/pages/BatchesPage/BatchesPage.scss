@@ -1,0 +1,179 @@
+.batches-page {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: #1a1a1a;
+    }
+
+    .stats {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.9rem;
+      color: #555;
+
+      .active {
+        color: #2e8b57;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+
+    .search-input {
+      padding: 0.6rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      flex: 1;
+      min-width: 200px;
+
+      &:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+      }
+    }
+
+    .status-filter {
+      padding: 0.6rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: white;
+      font-size: 1rem;
+    }
+  }
+
+  .table-container {
+    overflow-x: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: white;
+
+    .batches-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+
+      th {
+        background: #f8f9fa;
+        text-align: left;
+        padding: 1rem;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #dee2e6;
+      }
+
+      td {
+        padding: 0.9rem 1rem;
+        border-bottom: 1px solid #eee;
+      }
+
+      tr:hover {
+        background: #f5f7fa;
+      }
+
+      .barcode-cell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+
+        small {
+          font-family: monospace;
+          font-size: 0.75rem;
+          color: #666;
+        }
+      }
+
+      .status-badge {
+        padding: 0.3rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .status-active { background: #d4edda; color: #155724; }
+      .status-quarantine { background: #fff3cd; color: #856404; }
+      .status-certified { background: #d1ecf1; color: #0c5460; }
+      .status-shipped { background: #d6d8db; color: #383d41; }
+      .status-scrapped { background: #f8d7da; color: #721c24; }
+
+      .btn-sm {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:hover {
+          background: #0056b3;
+        }
+      }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: #888;
+      font-style: italic;
+    }
+  }
+
+  .loading, .error {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.1rem;
+  }
+
+  .error {
+    color: #dc3545;
+  }
+}
+
+@media (max-width: 768px) {
+  .batches-page {
+    padding: 0.5rem;
+
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .filters {
+      flex-direction: column;
+
+      .search-input, .status-filter {
+        width: 100%;
+      }
+    }
+
+    .batches-table {
+      font-size: 0.85rem;
+
+      th, td {
+        padding: 0.6rem;
+      }
+    }
+  }
+}

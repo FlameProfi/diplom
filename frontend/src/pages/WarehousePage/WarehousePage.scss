@@ -1,0 +1,229 @@
+// src/pages/WarehousePage.scss
+
+// --- Новая цветовая палитра для темной темы ---
+$bg-dark: #1A1D24; // Основной фон
+$surface-dark: #2C2F38; // Фон карточек и элементов
+$border-dark: #404450; // Цвет границ
+$text-primary-dark: #EAEAEA; // Основной текст
+$text-secondary-dark: #A0A3AF; // Вторичный текст
+$accent-primary: #3A7DFF; // Основной акцент (синий)
+$accent-primary-hover: #5A92FF;
+$accent-success: #28a745; // Оставим зеленый для успешных операций
+$accent-success-hover: #218838;
+$accent-warning: #ffc107; // Желтый для предупреждений
+$accent-warning-hover: #e0a800;
+$accent-danger: #dc3545; // Красный для ошибок
+
+.warehouse-page {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: $bg-dark; // Изменен фон
+  color: $text-primary-dark; // Изменен цвет текста
+  min-height: 100vh;
+
+  h2 {
+    font-size: 1.8rem;
+    color: $text-primary-dark; // Изменен цвет
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  // Вкладки
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+
+    button {
+      flex: 1;
+      min-width: 120px;
+      padding: 0.75rem 1rem;
+      background: $surface-dark; // Изменен фон
+      border: 1px solid $border-dark; // Изменена граница
+      border-bottom: 1px solid $border-dark;
+      color: $text-secondary-dark; // Изменен цвет текста
+      border-radius: 6px 6px 0 0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+
+      &.active {
+        background: $accent-primary; // Акцентный цвет
+        color: white;
+        border-color: $accent-primary;
+        border-bottom: 1px solid $accent-primary;
+        box-shadow: none; // Убрали тень
+      }
+
+      &:hover:not(.active) {
+        background: lighten($surface-dark, 5%);
+        color: $text-primary-dark;
+      }
+    }
+  }
+
+  // Общие стили для контейнеров
+  .scanner-container,
+  .batch-card,
+  .stock-table,
+  .reserve-section,
+  .notifications-list {
+    background: $surface-dark; // Общий фон для всех карточек
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: none; // Убрали тени
+    border: 1px solid $border-dark; // Добавили границу
+    margin-bottom: 1rem;
+  }
+
+  .batch-card, .reserve-section {
+    h3 {
+      font-size: 1.4rem;
+      color: $accent-primary; // Акцентный цвет
+      margin-bottom: 1rem;
+    }
+
+    p {
+      margin-bottom: 0.5rem;
+      color: $text-secondary-dark; // Вторичный текст
+    }
+
+    select, input[type="number"] {
+      padding: 0.5rem;
+      border: 1px solid $border-dark;
+      background-color: $bg-dark;
+      color: $text-primary-dark;
+      border-radius: 4px;
+      margin-right: 0.5rem;
+      width: 120px;
+
+      &:focus {
+        outline: none;
+        border-color: $accent-primary;
+      }
+    }
+  }
+
+  .batch-card button {
+    background: $accent-success;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: $accent-success-hover;
+    }
+
+    &:disabled {
+      background: darken($surface-dark, 5%);
+      cursor: not-allowed;
+    }
+  }
+
+  // Таблица остатков
+  .stock-table {
+    overflow: hidden;
+    padding: 0; // Убираем внутренний отступ, чтобы таблица заняла все место
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+
+      th {
+        background: lighten($surface-dark, 5%); // Фон заголовка
+        color: $text-primary-dark;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid $border-dark;
+      }
+
+      td {
+        padding: 1rem;
+        border-bottom: 1px solid $border-dark; // Граница строк
+        color: $text-secondary-dark;
+      }
+
+      tr {
+        background-color: $surface-dark;
+        transition: background-color 0.2s;
+      }
+
+      tr:hover {
+        background: lighten($surface-dark, 3%); // Подсветка при наведении
+      }
+
+      tr:nth-child(even) {
+        background: $surface-dark; // Убираем зебру, она не нужна в темной теме
+      }
+    }
+  }
+
+  // Резерв
+  .reserve-section button {
+    background: $accent-warning;
+    color: #212529;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+
+    &:hover {
+      background: $accent-warning-hover;
+    }
+  }
+
+  // Уведомления
+  .notifications-list {
+    h3 {
+      margin-bottom: 1rem;
+      color: $accent-danger;
+    }
+
+    .notification-item {
+      padding: 0.75rem;
+      border: 1px solid darken($accent-warning, 30%);
+      background: rgba($accent-warning, 0.1); // Полупрозрачный фон
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      color: $text-primary-dark;
+
+      &:last-child {
+        border-bottom: 1px solid darken($accent-warning, 30%);
+      }
+    }
+  }
+
+  // Адаптивность для PWA/мобильных
+  @media (max-width: 768px) {
+    padding: 0.5rem; // Уменьшаем отступы на мобильных
+
+    .batch-card, .reserve-section, .stock-table, .notifications-list {
+      padding: 1rem;
+    }
+    
+    .stock-table {
+      padding: 0;
+    }
+
+    table {
+      font-size: 0.85rem;
+
+      th, td {
+        padding: 0.5rem;
+      }
+    }
+
+    select, input[type="number"] {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+  }
+}

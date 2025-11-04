@@ -1,33 +1,31 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useNavigate } from "react-router"
+import { Route, Routes } from 'react-router-dom'
 import './App.css'
+import ProtectedRoute from './components/ProtectedRoute'
+import { AuthProvider } from './context/AuthContext'
+import BatchesPage from './pages/BatchesPage/BatchesPage'
+import CustomersPage from './pages/CustomersPage/CustomersPage'
+import LoginPage from './pages/LoginPage/LoginPage'
+import OrdersPage from './pages/OrdersPage/OrdersPage'
+import WarehousePage from './pages/WarehousePage/WarehousePage'
+import { Role } from './utils/roles'
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const navigate = useNavigate();
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <AuthProvider> 
+      <Routes>
+        <Route path="/" element={<div onClick={() => navigate("/warehouse")}>Главная</div>} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/batches" element={<BatchesPage />} />
+        <Route element={<ProtectedRoute requiredRole={Role.WAREHOUSE_WORKER} />}>
+            <Route path="/warehouse" element={<WarehousePage />} />
+          </Route>
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/customers" element={<CustomersPage />} />
+      </Routes>
+      </AuthProvider>
     </>
   )
 }
