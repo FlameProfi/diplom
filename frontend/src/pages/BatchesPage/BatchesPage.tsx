@@ -2,13 +2,14 @@
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import BarcodeDisplay from '../../components/BarcodeDisplay/BarcodeDisplay'
 import './BatchesPage.scss'
 
 const BatchesPage = () => {
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('ALL');
-
+  const navigate = useNavigate();
   const { data: batches = [], isLoading, error } = useQuery({
     queryKey: ['batches'],
     queryFn: async () => {
@@ -94,7 +95,8 @@ const BatchesPage = () => {
                   </span>
                 </td>
                 <td>
-                  <button className="btn btn-sm">Подробно</button>
+                  <button className="btn btn-sm" 
+                  onClick={() => navigate(`/batches/${batch.id}`)}>Подробно</button>
                 </td>
               </tr>
             ))}

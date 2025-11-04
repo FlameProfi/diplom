@@ -42,6 +42,15 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum BatchStatus {
+  DRAFT
+  QUARANTINE
+  CERTIFIED
+  ACTIVE
+  SHIPPED
+  SCRAPPED
+}
+
 enum ShipmentStatus {
   PENDING
   IN_TRANSIT
@@ -214,8 +223,7 @@ model Batch {
   movements InventoryMovement[]
 
   // Заказы (привязка партии к заказу)
-  orderItems OrderItem[]
-
+  orderItems   OrderItem[]
   // Расход материалов
   consumptions Consumption[]
 

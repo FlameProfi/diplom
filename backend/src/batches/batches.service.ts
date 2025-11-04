@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { BatchStatus } from '@prisma/client'
 import { createCanvas } from 'canvas'
 import JsBarcode from 'jsbarcode'
 import { PrismaService } from '../prisma/prisma.service'
@@ -9,16 +10,24 @@ export class BatchesService {
 
   async findAll() {
     return this.prisma.batch.findMany({
-      include: { productType: true }, // Включаем связанные данные
+      include: { productType: true },
     });
   }
 
   async findOne(id: string) {
-    return this.prisma.batch.findUnique({
+    const batch = await this.prisma.batch.findUnique({
       where: { id },
-      include: { productType: true },
+      include: {
+        productType: true,
+        stockItems: { include: { warehouse: true } },
+        movements: { include: { user: true, toWarehouse: true } },
+        documents: true,
+      },
     });
+    if (!batch) throw new NotFoundException(`Batch with ID ${id} not found`);
+    return batch;
   }
+
   async create(createBatchDto: any) {
     const barcode = this.generateBarcode();
     const batch = await this.prisma.batch.create({
@@ -45,5 +54,48 @@ export class BatchesService {
       where: { barcode },
       include: { productType: true, stockItems: true },
     });
+  }
+  
+  async updateStatus(batchId: string, newStatus: BatchStatus) {
+    // Проверяем существование партии
+    const batch = await this.prisma.batch.findUnique({ 
+      where: { id: batchId },
+      select: { status: true }
+    });
+    if (!batch) {
+      throw new NotFoundException(`Batch with ID ${batchId} not found`);
+    }
+
+    // Валидация переходов статусов (простая логика)
+    const validTransitions: Record<BatchStatus, BatchStatus[]> = {
+      DRAFT: ['QUARANTINE', 'CERTIFIED'],
+      QUARANTINE: ['CERTIFIED'],
+      CERTIFIED: ['ACTIVE', 'SHIPPED', 'SCRAPPED'],
+      ACTIVE: ['SHIPPED', 'SCRAPPED'],
+      SHIPPED: ['SCRAPPED'],
+      SCRAPPED: [],
+    };
+
+    if (!validTransitions[batch.status as BatchStatus]?.includes(newStatus)) {
+      throw new BadRequestException(
+        `Cannot change status from ${batch.status} to ${newStatus}. ` +
+        `Allowed transitions from ${batch.status}: ${validTransitions[batch.status as BatchStatus]?.join(', ') || 'none'}`
+      );
+    }
+
+    const updated = await this.prisma.batch.update({
+      where: { id: batchId },
+      data: { status: newStatus },
+      include: { 
+        productType: true, 
+        movements: {
+          take: 5,
+          orderBy: { date: 'desc' },
+          include: { user: { select: { name: true } } }
+        },
+      },
+    });
+
+    return updated;
   }
 }

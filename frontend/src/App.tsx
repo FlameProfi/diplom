@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom'
 import './App.css'
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
+import BatchDetailPage from './pages/BatchDetailPage/BatchDetailPage'
 import BatchesPage from './pages/BatchesPage/BatchesPage'
 import CustomersPage from './pages/CustomersPage/CustomersPage'
 import LoginPage from './pages/LoginPage/LoginPage'
@@ -22,6 +23,7 @@ function App() {
         <Route element={<ProtectedRoute requiredRole={Role.WAREHOUSE_WORKER} />}>
             <Route path="/warehouse" element={<WarehousePage />} />
           </Route>
+        <Route path="/batches/:id" element={<BatchDetailPage />} />
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/customers" element={<CustomersPage />} />
       </Routes>
