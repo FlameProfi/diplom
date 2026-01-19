@@ -1,4 +1,5 @@
-﻿using Backend.Models;
+﻿using Backend.Infrastructure;
+using Backend.Models;
 using Backend.Models.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -119,9 +120,7 @@ namespace Backend.Controllers
         //[SwaggerOperation(Summary = "Создать партию")]
         public async Task<ActionResult<Batch>> CreateBatch(Batch batch)
         {
-            batch.Id = Guid.NewGuid().ToString();
-            batch.CreatedAt = DateTime.UtcNow;
-            batch.UpdatedAt = DateTime.UtcNow;
+            EntityDefaults.ApplyCreationDefaults(batch);
 
             _context.Batches.Add(batch);
             await _context.SaveChangesAsync();
