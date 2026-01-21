@@ -106,7 +106,7 @@ const BatchDetailPage: React.FC = () => {
     </div>
     <div className="info-item">
       <label>Тип продукта</label>
-      <div className="value">{batch.productType?.name || 'Не указан'}</div>
+      <div className="value">{batch.productType?.name || batch.productTypeName || 'Не указан'}</div>
     </div>
     <div className="info-item">
       <label>Общее количество</label>

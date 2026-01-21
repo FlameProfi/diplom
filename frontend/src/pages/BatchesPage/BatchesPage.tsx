@@ -77,7 +77,7 @@ const BatchesPage = () => {
             {filteredBatches.map((batch: any) => (
               <tr key={batch.id} className={`status-${batch.status.toLowerCase()}`}>
                 <td>{batch.batchNumber}</td>
-                <td>{batch.productType?.name || '—'}</td>
+                <td>{batch.productType?.name || batch.productTypeName || '—'}</td>
                 <td>{batch.quantity} {batch.unit}</td>
                 <td>
                   {batch.barcode ? (

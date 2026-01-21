@@ -15,6 +15,8 @@ public partial class InventoryMovement
 
     public double Quantity { get; set; }
 
+    public string Type { get; set; } = null!;
+
     public DateTime Date { get; set; }
 
     public string? Reason { get; set; }
