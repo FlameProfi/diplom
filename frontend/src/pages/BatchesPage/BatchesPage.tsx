@@ -1,9 +1,9 @@
 // src/pages/BatchesPage.tsx
 import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import BarcodeDisplay from '../../components/BarcodeDisplay/BarcodeDisplay'
+import api from '../../services/api'
 import './BatchesPage.scss'
 
 const BatchesPage = () => {
@@ -13,7 +13,7 @@ const BatchesPage = () => {
   const { data: batches = [], isLoading, error } = useQuery({
     queryKey: ['batches'],
     queryFn: async () => {
-      const res = await axios.get('/api/batches');
+      const res = await api.get('/batches');
       return res.data;
     },
   });

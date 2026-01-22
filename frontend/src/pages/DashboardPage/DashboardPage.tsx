@@ -3,7 +3,7 @@ import api from '../../services/api'
 import './DashboardPage.scss'
 
 const DashboardPage = () => {
-  const { data: batches = [] } = useQuery({
+  const { data: batches = [], isLoading: batchesLoading, error: batchesError } = useQuery({
     queryKey: ['dashboard', 'batches'],
     queryFn: async () => {
       const res = await api.get('/batches')
@@ -11,7 +11,7 @@ const DashboardPage = () => {
     },
   })
 
-  const { data: orders = [] } = useQuery({
+  const { data: orders = [], isLoading: ordersLoading, error: ordersError } = useQuery({
     queryKey: ['dashboard', 'orders'],
     queryFn: async () => {
       const res = await api.get('/orders')
@@ -19,7 +19,7 @@ const DashboardPage = () => {
     },
   })
 
-  const { data: customers = [] } = useQuery({
+  const { data: customers = [], isLoading: customersLoading, error: customersError } = useQuery({
     queryKey: ['dashboard', 'customers'],
     queryFn: async () => {
       const res = await api.get('/customers')
@@ -27,7 +27,7 @@ const DashboardPage = () => {
     },
   })
 
-  const { data: stock = [] } = useQuery({
+  const { data: stock = [], isLoading: stockLoading, error: stockError } = useQuery({
     queryKey: ['dashboard', 'stock'],
     queryFn: async () => {
       const res = await api.get('/stock')
@@ -35,11 +35,22 @@ const DashboardPage = () => {
     },
   })
 
+  const isLoading = batchesLoading || ordersLoading || customersLoading || stockLoading
+  const hasError = batchesError || ordersError || customersError || stockError
+
   const totalStock = stock.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0)
   const reservedStock = stock.reduce((sum: number, item: any) => sum + (item.reserved || 0), 0)
 
   const activeBatches = batches.filter((batch: any) => batch.status === 'ACTIVE').length
   const pendingOrders = orders.filter((order: any) => order.status === 'NEW').length
+
+  if (isLoading) {
+    return <div className="dashboard-state">Загрузка данных...</div>
+  }
+
+  if (hasError) {
+    return <div className="dashboard-state error">Ошибка загрузки данных</div>
+  }
 
   return (
     <div className="dashboard-page">

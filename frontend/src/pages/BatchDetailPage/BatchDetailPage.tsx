@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import axios from 'axios'
 import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import api from '../../services/api'
 import './BatchDetailPage.scss'
 const BatchDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,7 +14,7 @@ const BatchDetailPage: React.FC = () => {
   const { data: batch, isLoading, error, refetch } = useQuery({
     queryKey: ['batch', id],
     queryFn: async () => {
-      const res = await axios.get(`/api/batches/${id}`);
+      const res = await api.get(`/batches/${id}`);
       return res.data;
     },
     enabled: !!id,
@@ -23,7 +23,7 @@ const BatchDetailPage: React.FC = () => {
   // Мутирование статуса
   const updateStatusMutation = useMutation({
     mutationFn: async (newStatus: string) => {
-      const res = await axios.put(`/api/batches/${id}/status`, { status: newStatus });
+      const res = await api.put(`/batches/${id}/status`, { status: newStatus });
       return res.data;
     },
     onSuccess: () => {
@@ -36,7 +36,7 @@ const BatchDetailPage: React.FC = () => {
   // Мутирование загрузки документа
   const uploadDocumentMutation = useMutation({
     mutationFn: async (formData: FormData) => {
-      const res = await axios.post(`/api/batches/${id}/documents`, formData, {
+      const res = await api.post(`/batches/${id}/documents`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       return res.data;
@@ -72,7 +72,7 @@ const BatchDetailPage: React.FC = () => {
   const handleDeleteDocument = async (documentId: string) => {
     if (!confirm('Удалить документ?')) return;
     try {
-      await axios.delete(`/api/batches/documents/${documentId}`);
+      await api.delete(`/batches/documents/${documentId}`);
       refetch();
     } catch (error) {
       alert('Ошибка удаления файла');
