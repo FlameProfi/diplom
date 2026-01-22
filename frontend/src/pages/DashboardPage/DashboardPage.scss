@@ -1,0 +1,125 @@
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.summary-card {
+  background: #fff;
+  border: 1px solid #e4e7ec;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+}
+
+.summary-card h2 {
+  margin: 6px 0 8px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.summary-label {
+  margin: 0;
+  font-size: 13px;
+  color: #667085;
+}
+
+.summary-meta {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.dashboard-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.panel {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e4e7ec;
+  padding: 18px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.panel-header span {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panel-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.row-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.row-subtitle {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.status-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-pill.status-active {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-pill.status-quarantine {
+  background: #fef9c3;
+  color: #a16207;
+}
+
+.status-pill.status-shipped {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.panel-amount {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.empty-state {
+  font-size: 13px;
+  color: #94a3b8;
+}
