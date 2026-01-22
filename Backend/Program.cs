@@ -1,6 +1,7 @@
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,12 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseCors("AllowFrontend");
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "uploads")),
+    RequestPath = "/uploads"
+});
 
 app.UseAuthorization();
 

@@ -13,6 +13,8 @@
         public string ProductTypeId { get; set; } = string.Empty;
         public string ProductTypeName { get; set; } = string.Empty; 
 
+        public ProductTypeSummaryDto? ProductType { get; set; }
+
         public List<StockItemDto>? StockItems { get; set; } = new(); 
     }
 

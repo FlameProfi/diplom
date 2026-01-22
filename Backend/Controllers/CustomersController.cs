@@ -1,4 +1,5 @@
-﻿using Backend.Models;
+﻿using Backend.Infrastructure;
+using Backend.Models;
 using Backend.Models.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,9 +44,7 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<Customer>> CreateCustomer(Customer customer)
         {
-            customer.Id = Guid.NewGuid().ToString();
-            customer.CreatedAt = DateTime.UtcNow;
-            customer.UpdatedAt = DateTime.UtcNow;
+            EntityDefaults.ApplyCreationDefaults(customer);
 
             _context.Customers.Add(customer);
             await _context.SaveChangesAsync();

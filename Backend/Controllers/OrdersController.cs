@@ -1,4 +1,5 @@
-﻿using Backend.Models;
+﻿using Backend.Infrastructure;
+using Backend.Models;
 using Backend.Models.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -51,9 +52,7 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<Order>> CreateOrder(Order order)
         {
-            order.Id = Guid.NewGuid().ToString();
-            order.CreatedAt = DateTime.UtcNow;
-            order.UpdatedAt = DateTime.UtcNow;
+            EntityDefaults.ApplyCreationDefaults(order);
 
             _context.Orders.Add(order);
             await _context.SaveChangesAsync(); 
@@ -67,7 +66,7 @@ namespace Backend.Controllers
             var order = await _context.Orders.FindAsync(id);
             if (order == null) return NotFound();
             //order.Status = status;
-            order.UpdatedAt = DateTime.UtcNow;
+            EntityDefaults.ApplyUpdateDefaults(order);
 
             await _context.SaveChangesAsync();
             return Ok(order);

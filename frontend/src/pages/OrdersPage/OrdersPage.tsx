@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import axios from 'axios'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'; // Added useFieldArray
+import api from '../../services/api'
 import './OrdersPage.scss'
 
 interface OrderItemForm {
@@ -25,32 +25,32 @@ const OrdersPage = () => {
   const [filterStatus, setFilterStatus] = useState('ALL');
   const currentDate = new Date('2025-11-04').toISOString().split('T')[0];  // Hardcoded for now; use real date lib in prod
 
-  const { data: orders = [], isLoading: ordersLoading } = useQuery({
+  const { data: orders = [], isLoading: ordersLoading, error: ordersError } = useQuery({
     queryKey: ['orders'],
     queryFn: async () => {
-      const res = await axios.get('/api/orders');
+      const res = await api.get('/orders');
       return res.data;
     },
   });
 
-  const { data: customers = [], isLoading: customersLoading } = useQuery({
+  const { data: customers = [], isLoading: customersLoading, error: customersError } = useQuery({
     queryKey: ['customers'],
     queryFn: async () => {
-      const res = await axios.get('/api/customers');  // Add endpoint in CustomersModule later
+      const res = await api.get('/customers');  // Add endpoint in CustomersModule later
       return res.data;
     },
   });
 
-  const { data: batches = [], isLoading: batchesLoading } = useQuery({
+  const { data: batches = [], isLoading: batchesLoading, error: batchesError } = useQuery({
     queryKey: ['batches'],
     queryFn: async () => {
-      const res = await axios.get('/api/batches');
+      const res = await api.get('/batches');
       return res.data;
     },
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: CreateOrderForm) => axios.post('/api/orders', data),
+    mutationFn: (data: CreateOrderForm) => api.post('/orders', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       setShowForm(false);
@@ -65,7 +65,7 @@ const OrdersPage = () => {
 
   const updateStatusMutation = useMutation({  // New: For updating status
     mutationFn: ({ id, status }: { id: string; status: string }) =>
-      axios.patch(`/api/orders/${id}/status/${status}`),
+      api.patch(`/orders/${id}/status/${status}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
@@ -91,7 +91,9 @@ const OrdersPage = () => {
   // Watch orderItems to calculate totalAmount dynamically
   const orderItems = watch('orderItems');
   const totalAmount = orderItems?.reduce((sum, item) => sum + (item.quantity * item.price), 0) || 0;
-  setValue('totalAmount', totalAmount);  // Update form value
+  useEffect(() => {
+    setValue('totalAmount', totalAmount);
+  }, [setValue, totalAmount]);
 
   // Validate expectedDelivery > current date
   const watchedDelivery = watch('expectedDelivery');
@@ -110,6 +112,7 @@ const OrdersPage = () => {
   };
 
   if (ordersLoading || customersLoading || batchesLoading) return <div>Загрузка...</div>;
+  if (ordersError || customersError || batchesError) return <div>Ошибка загрузки данных</div>;
 
   return (
     <div className="orders-page">

@@ -330,6 +330,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Quantity).HasColumnName("quantity");
             entity.Property(e => e.Reason).HasColumnName("reason");
             entity.Property(e => e.ToWarehouseId).HasColumnName("toWarehouseId");
+            entity.Property(e => e.Type).HasColumnName("type");
             entity.Property(e => e.UserId).HasColumnName("userId");
 
             entity.HasOne(d => d.Batch).WithMany(p => p.InventoryMovements)

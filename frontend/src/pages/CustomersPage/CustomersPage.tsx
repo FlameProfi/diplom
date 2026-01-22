@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import axios from 'axios'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
+import api from '../../services/api'
 import './CustomersPage.scss'
 
 interface CreateCustomerForm {
@@ -20,17 +20,17 @@ const CustomersPage = () => {
   const [searchRegion, setSearchRegion] = useState('');
   const [showForm, setShowForm] = useState(false);
 
-  const { data: customers = [], isLoading } = useQuery({
+  const { data: customers = [], isLoading, error } = useQuery({
     queryKey: ['customers', searchRegion],
     queryFn: async () => {
       const params = searchRegion ? { region: searchRegion } : {};
-      const res = await axios.get('/api/customers', { params });
+      const res = await api.get('/customers', { params });
       return res.data;
     },
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: CreateCustomerForm) => axios.post('/api/customers', data),
+    mutationFn: (data: CreateCustomerForm) => api.post('/customers', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       setShowForm(false);
@@ -46,6 +46,7 @@ const CustomersPage = () => {
   };
 
   if (isLoading) return <div>Загрузка клиентов...</div>;
+  if (error) return <div>Ошибка загрузки клиентов</div>;
 
   return (
     <div className="customers-page">
@@ -101,7 +102,7 @@ const CustomersPage = () => {
               <td>{customer.country}</td>
               <td>
                 <Link to={`/orders?customerId=${customer.id}`} className="link">
-                  {customer.orders?.length || 0} заказов
+                  {customer.ordersCount ?? customer.orders?.length ?? 0} заказов
                 </Link>
               </td>
               <td>
