@@ -8,6 +8,8 @@
         public string? Phone { get; set; }
         public string? Region { get; set; }
         public string? Country { get; set; }
+        public string? Address { get; set; }
+        public string? TaxId { get; set; }
         public DateTime CreatedAt { get; set; }
 
         public int OrdersCount { get; set; }
