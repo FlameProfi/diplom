@@ -237,23 +237,28 @@ namespace Backend.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Batch>> UpdateBatchStatus(string id, [FromBody] BatchStatusUpdateRequest request)
         {
+            if (request == null || string.IsNullOrWhiteSpace(request.Status))
+            {
+                return BadRequest(new { Message = "Статус обязателен" });
+            }
+
             var batch = await _context.Batches.FindAsync(id);
             if (batch == null)
             {
                 return NotFound(new { Message = "Партия не найдена" });
             }
 
-            batch.Status = request.Status;
+            batch.Status = request.Status.Trim().ToUpperInvariant();
             batch.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
-            return Ok(batch);
+            return Ok(new { batch.Id, batch.Status });
         }
 
         [HttpPost("{id}/documents")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<BatchDocumentDto>> UploadDocument(string id, IFormFile? file, [FromForm] string? type = null)
+        public async Task<ActionResult<BatchDocumentDto>> UploadDocument(string id, [FromForm] IFormFile? file, [FromForm] string? type = null)
         {
             var batch = await _context.Batches.FindAsync(id);
             if (batch == null)
@@ -266,41 +271,54 @@ namespace Backend.Controllers
                 return BadRequest(new { Message = "Файл пуст" });
             }
 
-            var uploadsRoot = Path.Combine(_environment.ContentRootPath, "uploads", "batches");
-            Directory.CreateDirectory(uploadsRoot);
-
-            var safeOriginalName = Path.GetFileName(file.FileName);
-            var fileName = $"{Guid.NewGuid():N}__{safeOriginalName}";
-            var filePath = Path.Combine(uploadsRoot, fileName);
-
-            await using (var stream = System.IO.File.Create(filePath))
+            try
             {
-                await file.CopyToAsync(stream);
+                var uploadsRoot = Path.Combine(_environment.ContentRootPath, "uploads", "batches");
+                Directory.CreateDirectory(uploadsRoot);
+
+                var safeOriginalName = Path.GetFileName(file.FileName);
+                if (string.IsNullOrWhiteSpace(safeOriginalName))
+                {
+                    safeOriginalName = "document";
+                }
+
+                var fileName = $"{Guid.NewGuid():N}__{safeOriginalName}";
+                var filePath = Path.Combine(uploadsRoot, fileName);
+
+                await using (var stream = System.IO.File.Create(filePath))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                var document = new Document
+                {
+                    BatchId = batch.Id,
+                    Type = string.IsNullOrWhiteSpace(type) ? "GENERAL" : type,
+                    FilePath = $"/uploads/batches/{fileName}",
+                    IssuedDate = DateTime.UtcNow
+                };
+
+                EntityDefaults.ApplyCreationDefaults(document);
+                _context.Documents.Add(document);
+                await _context.SaveChangesAsync();
+
+                var dto = new BatchDocumentDto
+                {
+                    Id = document.Id,
+                    Type = document.Type,
+                    FilePath = document.FilePath ?? string.Empty,
+                    FileName = safeOriginalName,
+                    FileSize = file.Length,
+                    UploadDate = document.IssuedDate
+                };
+
+                return CreatedAtAction(nameof(GetBatchById), new { id = batch.Id }, dto);
             }
-
-            var document = new Document
+            catch (Exception ex)
             {
-                BatchId = batch.Id,
-                Type = string.IsNullOrWhiteSpace(type) ? "GENERAL" : type,
-                FilePath = $"/uploads/batches/{fileName}",
-                IssuedDate = DateTime.UtcNow
-            };
-
-            EntityDefaults.ApplyCreationDefaults(document);
-            _context.Documents.Add(document);
-            await _context.SaveChangesAsync();
-
-            var dto = new BatchDocumentDto
-            {
-                Id = document.Id,
-                Type = document.Type,
-                FilePath = document.FilePath ?? string.Empty,
-                FileName = safeOriginalName,
-                FileSize = file.Length,
-                UploadDate = document.IssuedDate
-            };
-
-            return CreatedAtAction(nameof(GetBatchById), new { id = batch.Id }, dto);
+                _logger.LogError(ex, "Ошибка при загрузке документа для партии {BatchId}", id);
+                return StatusCode(500, "Не удалось загрузить документ");
+            }
         }
 
         [HttpDelete("documents/{documentId}")]

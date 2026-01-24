@@ -119,10 +119,17 @@ const BatchDetailPage: React.FC = () => {
     return apiBase ? apiBase.replace(/\/api\/?$/, '') : ''
   }, [])
 
-  const buildFileUrl = (path: string) => {
+  const buildFileUrl = (path?: string) => {
     if (!path) return '#'
     if (path.startsWith('http://') || path.startsWith('https://')) return path
     return `${baseUrl}${path}`
+  }
+
+  const normalizeStatusClass = (status?: string) => String(status || 'unknown').toLowerCase()
+
+  const formatFileSize = (size?: number) => {
+    const normalized = Number.isFinite(size) ? Number(size) : 0
+    return `${(normalized / 1024).toFixed(1)} KB`
   }
 
   if (isLoading) return <div className="loading">Загрузка...</div>
@@ -170,8 +177,8 @@ const BatchDetailPage: React.FC = () => {
             <div className="info-item status-item">
               <label>Статус</label>
               <div className="value">
-                <span className={`status-badge ${batch.status.toLowerCase()}`}>
-                  {statusLabels[batch.status] || batch.status}
+                <span className={`status-badge ${normalizeStatusClass(batch.status)}`}>
+                  {statusLabels[batch.status] || batch.status || '—'}
                 </span>
                 <select
                   value={selectedStatus || batch.status}
@@ -308,7 +315,7 @@ const BatchDetailPage: React.FC = () => {
             >
               {uploadDocumentMutation.isPending ? 'Загрузка...' : 'Загрузить документ'}
             </button>
-            {file && <span>Выбран: {file.name} ({(file.size / 1024).toFixed(1)} KB)</span>}
+            {file && <span>Выбран: {file.name} ({formatFileSize(file.size)})</span>}
           </div>
 
           {batch.documents?.length ? (
@@ -326,7 +333,7 @@ const BatchDetailPage: React.FC = () => {
                     </a>
                     <div className="document-meta">
                       <span className="file-size">
-                        {(doc.fileSize / 1024).toFixed(1)} KB
+                        {formatFileSize(doc.fileSize)}
                       </span>
                       <span>{doc.type || 'GENERAL'}</span>
                       <span>{formatDateTime(doc.uploadDate)}</span>

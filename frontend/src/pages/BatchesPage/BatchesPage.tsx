@@ -20,10 +20,13 @@ const BatchesPage = () => {
 
   // Фильтрация
   const filteredBatches = batches.filter((batch: any) => {
+    const batchNumber = String(batch.batchNumber || '');
+    const barcode = String(batch.barcode || '');
+    const status = String(batch.status || '');
     const matchesSearch =
-      batch.batchNumber.toLowerCase().includes(search.toLowerCase()) ||
-      (batch.barcode && batch.barcode.toLowerCase().includes(search.toLowerCase()));
-    const matchesStatus = filterStatus === 'ALL' || batch.status === filterStatus;
+      batchNumber.toLowerCase().includes(search.toLowerCase()) ||
+      barcode.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = filterStatus === 'ALL' || status === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
@@ -75,7 +78,7 @@ const BatchesPage = () => {
           </thead>
           <tbody>
             {filteredBatches.map((batch: any) => (
-              <tr key={batch.id} className={`status-${batch.status.toLowerCase()}`}>
+              <tr key={batch.id} className={`status-${String(batch.status || 'unknown').toLowerCase()}`}>
                 <td>{batch.batchNumber}</td>
                 <td>{batch.productType?.name || batch.productTypeName || '—'}</td>
                 <td>{batch.quantity} {batch.unit}</td>
@@ -90,8 +93,8 @@ const BatchesPage = () => {
                   )}
                 </td>
                 <td>
-                  <span className={`status-badge status-${batch.status.toLowerCase()}`}>
-                    {getStatusText(batch.status)}
+                  <span className={`status-badge status-${String(batch.status || 'unknown').toLowerCase()}`}>
+                    {getStatusText(batch.status || '')}
                   </span>
                 </td>
                 <td>
