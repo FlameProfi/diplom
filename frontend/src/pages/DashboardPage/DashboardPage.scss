@@ -134,6 +134,31 @@
   font-size: 13px;
 }
 
+.panel-tag {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.panel-tag.tag-receipt {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.panel-tag.tag-issue {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.panel-tag.tag-reserve {
+  background: #fef9c3;
+  color: #a16207;
+}
+
 .empty-state {
   font-size: 13px;
   color: #94a3b8;
