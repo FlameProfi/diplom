@@ -71,6 +71,7 @@ $accent-info: #17a2b8;
 
   // Секции (карточки)
   .info-section,
+  .summary-section,
   .movements-section,
   .stock-section,
   .documents-section {
@@ -123,6 +124,10 @@ $accent-info: #17a2b8;
           color: $text-primary-dark;
           font-weight: 500;
         }
+
+        .barcode-wrap {
+          margin-top: 0.5rem;
+        }
       }
 
       // Специальные стили для статуса
@@ -148,11 +153,11 @@ $accent-info: #17a2b8;
     }
 
     // Селект для изменения статуса
-    .status-select {
-      padding: 0.5rem 0.75rem;
-      border: 1px solid $border-dark;
-      background-color: $bg-dark;
-      color: $text-primary-dark;
+  .status-select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid $border-dark;
+    background-color: $bg-dark;
+    color: $text-primary-dark;
       border-radius: 4px;
       font-size: 1rem;
       margin-left: 0.5rem;
@@ -167,6 +172,36 @@ $accent-info: #17a2b8;
       option {
         background: $surface-dark;
         color: $text-primary-dark;
+      }
+    }
+  }
+
+  .summary-section {
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+
+    .summary-item {
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      background: rgba($bg-dark, 0.5);
+      border-radius: 6px;
+      border-left: 4px solid $accent-primary;
+
+      label {
+        font-size: 0.85rem;
+        color: $text-secondary-dark;
+        margin-bottom: 0.25rem;
+        font-weight: 500;
+      }
+
+      .value {
+        font-size: 1.2rem;
+        color: $text-primary-dark;
+        font-weight: 600;
       }
     }
   }
@@ -276,7 +311,8 @@ $accent-info: #17a2b8;
   // Секция документов
   .documents-section {
     .upload-area {
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(160px, 220px) 1fr auto;
       gap: 1rem;
       margin-bottom: 1.5rem;
       padding: 1rem;
@@ -287,6 +323,32 @@ $accent-info: #17a2b8;
       &.dragover {
         border-color: $accent-primary;
         background: rgba($accent-primary, 0.05);
+      }
+
+      .upload-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .field-label {
+        font-size: 0.85rem;
+        color: $text-secondary-dark;
+      }
+
+      .doc-type-select {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid $border-dark;
+        background-color: $bg-dark;
+        color: $text-primary-dark;
+        border-radius: 4px;
+        font-size: 0.95rem;
+
+        &:focus {
+          outline: none;
+          border-color: $accent-primary;
+          box-shadow: 0 0 0 2px rgba($accent-primary, 0.2);
+        }
       }
 
       .file-input {
@@ -525,6 +587,7 @@ $accent-info: #17a2b8;
     }
 
     .info-section,
+    .summary-section,
     .movements-section,
     .stock-section,
     .documents-section {
@@ -537,8 +600,12 @@ $accent-info: #17a2b8;
     }
 
     .upload-area {
-      flex-direction: column;
+      grid-template-columns: 1fr;
       align-items: stretch;
+
+      .upload-controls {
+        width: 100%;
+      }
 
       .file-input,
       .upload-btn {
