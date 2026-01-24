@@ -17,6 +17,7 @@
     public class OrderItemDto
     {
         public string Id { get; set; } = string.Empty;
+        public string BatchId { get; set; } = string.Empty;
         public double Quantity { get; set; }
         public double? Price { get; set; }
         public string BatchNumber { get; set; } = string.Empty; 
