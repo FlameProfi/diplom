@@ -34,6 +34,8 @@ namespace Backend.Controllers
                 Phone = c.Phone,
                 Region = c.Region,
                 Country = c.Country,
+                Address = c.Address,
+                TaxId = c.TaxId,
                 CreatedAt = c.CreatedAt,
                 OrdersCount = c.Orders.Count 
             }).ToList();

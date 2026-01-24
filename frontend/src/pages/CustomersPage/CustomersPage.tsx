@@ -1,9 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import api from '../../services/api'
 import './CustomersPage.scss'
+
+interface Customer {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  region?: string;
+  country?: string;
+  address?: string;
+  taxId?: string;
+  createdAt: string;
+  ordersCount?: number;
+}
 
 interface CreateCustomerForm {
   name: string;
@@ -18,9 +31,10 @@ interface CreateCustomerForm {
 const CustomersPage = () => {
   const queryClient = useQueryClient();
   const [searchRegion, setSearchRegion] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
 
-  const { data: customers = [], isLoading, error } = useQuery({
+  const { data: customers = [], isLoading, error } = useQuery<Customer[]>({
     queryKey: ['customers', searchRegion],
     queryFn: async () => {
       const params = searchRegion ? { region: searchRegion } : {};
@@ -45,6 +59,24 @@ const CustomersPage = () => {
     reset();
   };
 
+  const filteredCustomers = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return customers;
+    return customers.filter((customer) => {
+      const haystack = [
+        customer.name,
+        customer.email,
+        customer.phone,
+        customer.region,
+        customer.country,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+      return haystack.includes(term);
+    });
+  }, [customers, searchTerm]);
+
   if (isLoading) return <div>Загрузка клиентов...</div>;
   if (error) return <div>Ошибка загрузки клиентов</div>;
 
@@ -52,7 +84,15 @@ const CustomersPage = () => {
     <div className="customers-page">
       <header className="page-header">
         <h1>Клиенты</h1>
-        <button onClick={() => setShowForm(!showForm)} className="btn btn-primary">
+        <div className="stats">
+          <span>Всего: {customers.length}</span>
+          <span>Регионов: {new Set(customers.map((customer) => customer.region).filter(Boolean)).size}</span>
+        </div>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="btn btn-primary"
+          disabled={createMutation.isPending}
+        >
           {showForm ? 'Отмена' : 'Новый клиент'}
         </button>
       </header>
@@ -66,53 +106,66 @@ const CustomersPage = () => {
           <input {...register('country')} placeholder="Страна" />
           <input {...register('address')} placeholder="Адрес" />
           <input {...register('taxId')} placeholder="Налоговый ID" />
-          <button type="submit" className="btn btn-success">Создать клиента</button>
+          <button type="submit" className="btn btn-success" disabled={createMutation.isPending}>
+            {createMutation.isPending ? 'Создаётся...' : 'Создать клиента'}
+          </button>
         </form>
       )}
 
       <div className="filters mb-4">
         <input
           type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Поиск по названию, email или телефону..."
+          className="search-input"
+        />
+        <input
+          type="text"
           value={searchRegion}
           onChange={(e) => setSearchRegion(e.target.value)}
-          placeholder="Поиск по региону..."
+          placeholder="Фильтр по региону (сервер)"
           className="search-input"
         />
       </div>
 
-      <table className="customers-table">
-        <thead>
-          <tr>
-            <th>Название</th>
-            <th>Email</th>
-            <th>Телефон</th>
-            <th>Регион</th>
-            <th>Страна</th>
-            <th>Заказы</th>
-            <th>Действия</th>
-          </tr>
-        </thead>
-        <tbody>
-          {customers.map((customer: any) => (
-            <tr key={customer.id}>
-              <td>{customer.name}</td>
-              <td>{customer.email}</td>
-              <td>{customer.phone}</td>
-              <td>{customer.region}</td>
-              <td>{customer.country}</td>
-              <td>
-                <Link to={`/orders?customerId=${customer.id}`} className="link">
-                  {customer.ordersCount ?? customer.orders?.length ?? 0} заказов
-                </Link>
-              </td>
-              <td>
-                <Link to={`/customers/${customer.id}`} className="btn btn-sm">Подробно</Link>
-              </td>
+      <div className="table-container">
+        <table className="customers-table">
+          <thead>
+            <tr>
+              <th>Название</th>
+              <th>Email</th>
+              <th>Телефон</th>
+              <th>Регион</th>
+              <th>Страна</th>
+              <th>Адрес</th>
+              <th>Налоговый ID</th>
+              <th>Создан</th>
+              <th>Заказы</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      {customers.length === 0 && <div>Клиенты не найдены</div>}
+          </thead>
+          <tbody>
+            {filteredCustomers.map((customer) => (
+              <tr key={customer.id}>
+                <td>{customer.name}</td>
+                <td>{customer.email || '—'}</td>
+                <td>{customer.phone || '—'}</td>
+                <td>{customer.region || '—'}</td>
+                <td>{customer.country || '—'}</td>
+                <td>{customer.address || '—'}</td>
+                <td>{customer.taxId || '—'}</td>
+                <td>{new Date(customer.createdAt).toLocaleDateString('ru-RU')}</td>
+                <td>
+                  <Link to={`/orders?customerId=${customer.id}`} className="link">
+                    {customer.ordersCount ?? 0} заказов
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {filteredCustomers.length === 0 && <div className="empty-state">Клиенты не найдены</div>}
+      </div>
     </div>
   );
 };

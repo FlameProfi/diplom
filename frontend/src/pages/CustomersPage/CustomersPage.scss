@@ -8,6 +8,14 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
+    gap: 1rem;
+
+    .stats {
+      display: flex;
+      gap: 1rem;
+      font-weight: 600;
+      color: #495057;
+    }
   }
 
   .customer-form {
@@ -28,23 +36,32 @@
 
   .filters {
     margin-bottom: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
 
     .search-input {
       padding: 0.6rem;
       border: 1px solid #ccc;
       border-radius: 6px;
-      width: 300px;
+      width: 280px;
     }
+  }
+
+  .table-container {
+    overflow-x: auto;
   }
 
   .customers-table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 900px;
 
     th, td {
       padding: 1rem;
       text-align: left;
       border-bottom: 1px solid #eee;
+      vertical-align: top;
     }
 
     th {
@@ -73,5 +90,10 @@
       border-radius: 4px;
       cursor: pointer;
     }
+  }
+
+  .empty-state {
+    padding: 1.5rem 0;
+    color: #6c757d;
   }
 }
