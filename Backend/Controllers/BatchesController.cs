@@ -253,7 +253,7 @@ namespace Backend.Controllers
         [HttpPost("{id}/documents")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<BatchDocumentDto>> UploadDocument(string id, [FromForm] IFormFile? file, [FromForm] string? type = null)
+        public async Task<ActionResult<BatchDocumentDto>> UploadDocument(string id, IFormFile? file, [FromForm] string? type = null)
         {
             var batch = await _context.Batches.FindAsync(id);
             if (batch == null)

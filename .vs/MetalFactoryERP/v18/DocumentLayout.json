@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "D:\\diplom\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F76546FB-DEE8-40A9-9CAE-9CE7C3058773}|Backend\\Backend.csproj|d:\\diplom\\backend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F76546FB-DEE8-40A9-9CAE-9CE7C3058773}|Backend\\Backend.csproj|solutionrelative:backend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{F76546FB-DEE8-40A9-9CAE-9CE7C3058773}|Backend\\Backend.csproj|d:\\diplom\\backend\\controllers\\batchescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{F76546FB-DEE8-40A9-9CAE-9CE7C3058773}|Backend\\Backend.csproj|solutionrelative:backend\\controllers\\batchescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F76546FB-DEE8-40A9-9CAE-9CE7C3058773}|Backend\\Backend.csproj|d:\\diplom\\backend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F76546FB-DEE8-40A9-9CAE-9CE7C3058773}|Backend\\Backend.csproj|solutionrelative:backend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F76546FB-DEE8-40A9-9CAE-9CE7C3058773}|Backend\\Backend.csproj|d:\\diplom\\backend\\controllers\\customerscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -42,12 +42,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 5,
           "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
-            },
             {
               "$type": "Document",
               "DocumentIndex": 2,
@@ -110,26 +106,26 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "BatchesController.cs",
               "DocumentMoniker": "D:\\diplom\\Backend\\Controllers\\BatchesController.cs",
               "RelativeDocumentMoniker": "Backend\\Controllers\\BatchesController.cs",
               "ToolTip": "D:\\diplom\\Backend\\Controllers\\BatchesController.cs",
               "RelativeToolTip": "Backend\\Controllers\\BatchesController.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAAEgAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAOsAAAAAAAAAAAAiwBQBAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-28T14:10:04.113Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\diplom\\Backend\\Program.cs",
               "RelativeDocumentMoniker": "Backend\\Program.cs",
               "ToolTip": "D:\\diplom\\Backend\\Program.cs",
               "RelativeToolTip": "Backend\\Program.cs",
-              "ViewState": "AgIAAA8AAAAAAAAAAAAAADgAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAACgAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-28T14:02:52.779Z",
               "EditorCaption": ""
