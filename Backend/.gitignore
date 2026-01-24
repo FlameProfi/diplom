@@ -7,3 +7,5 @@ build
 /.vs
 .next
 ./node_modules
+bin
+obj
