@@ -7,6 +7,7 @@
         public string Status { get; set; } = string.Empty;
         public double? TotalAmount { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime? ExpectedDelivery { get; set; }
 
         public string CustomerId { get; set; } = string.Empty;
         public string CustomerName { get; set; } = string.Empty;

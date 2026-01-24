@@ -15,6 +15,8 @@ public partial class Order
 
     public string Currency { get; set; } = null!;
 
+    public string Status { get; set; } = null!;
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
