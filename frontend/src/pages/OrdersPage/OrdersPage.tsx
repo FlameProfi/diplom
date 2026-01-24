@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
+import { useSearchParams } from 'react-router-dom'
 import api from '../../services/api'
 import './OrdersPage.scss'
 
@@ -33,15 +34,18 @@ const statusOptions = [
 
 const OrdersPage = () => {
   const queryClient = useQueryClient()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [showForm, setShowForm] = useState(false)
   const [filterStatus, setFilterStatus] = useState('ALL')
   const [search, setSearch] = useState('')
   const currentDate = new Date().toISOString().split('T')[0]
+  const customerIdParam = searchParams.get('customerId')
 
   const { data: orders = [], isLoading: ordersLoading, error: ordersError } = useQuery({
-    queryKey: ['orders'],
+    queryKey: ['orders', customerIdParam],
     queryFn: async () => {
-      const res = await api.get('/orders')
+      const params = customerIdParam ? { customerId: customerIdParam } : undefined
+      const res = await api.get('/orders', { params })
       return res.data
     },
   })
@@ -113,6 +117,9 @@ const OrdersPage = () => {
 
   const filteredOrders = useMemo(() => {
     return orders.filter((order: any) => {
+      if (customerIdParam && order.customerId !== customerIdParam) {
+        return false
+      }
       const matchesStatus = filterStatus === 'ALL' || order.status === filterStatus
       const searchValue = search.trim().toLowerCase()
       const matchesSearch =
@@ -290,6 +297,15 @@ const OrdersPage = () => {
           placeholder="Поиск по номеру или клиенту..."
           className="search-input"
         />
+        {customerIdParam && (
+          <button
+            type="button"
+            className="btn btn-outline"
+            onClick={() => setSearchParams({})}
+          >
+            Сбросить фильтр клиента
+          </button>
+        )}
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
@@ -344,7 +360,7 @@ const OrdersPage = () => {
                 </td>
                 <td>
                   <select
-                    defaultValue={order.status}
+                    value={order.status}
                     onChange={(e) => {
                       if (e.target.value !== order.status) {
                         updateStatusMutation.mutate({ id: order.id, status: e.target.value })

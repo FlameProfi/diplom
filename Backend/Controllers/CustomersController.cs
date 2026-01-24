@@ -22,23 +22,27 @@ namespace Backend.Controllers
         public async Task<ActionResult<IEnumerable<CustomerDto>>> GetCustomers([FromQuery] string? region)
         {
             var query = _context.Customers.AsQueryable();
-            if (!string.IsNullOrEmpty(region)) query = query.Where(c => c.Region.Contains(region));
-
-            var customers = await query.ToListAsync();
-
-            var customerDtos = customers.Select(c => new CustomerDto
+            if (!string.IsNullOrEmpty(region))
             {
-                Id = c.Id,
-                Name = c.Name,
-                Email = c.Email,
-                Phone = c.Phone,
-                Region = c.Region,
-                Country = c.Country,
-                Address = c.Address,
-                TaxId = c.TaxId,
-                CreatedAt = c.CreatedAt,
-                OrdersCount = c.Orders.Count 
-            }).ToList();
+                query = query.Where(c => c.Region.Contains(region));
+            }
+
+            var customerDtos = await query
+                .OrderByDescending(c => c.CreatedAt)
+                .Select(c => new CustomerDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Email = c.Email,
+                    Phone = c.Phone,
+                    Region = c.Region,
+                    Country = c.Country,
+                    Address = c.Address,
+                    TaxId = c.TaxId,
+                    CreatedAt = c.CreatedAt,
+                    OrdersCount = c.Orders.Count
+                })
+                .ToListAsync();
 
             return Ok(customerDtos);
         }
