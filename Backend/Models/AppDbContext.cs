@@ -482,6 +482,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.OrderNumber).HasColumnName("orderNumber");
             entity.Property(e => e.PackingNotes).HasColumnName("packingNotes");
             entity.Property(e => e.ProductionNotes).HasColumnName("productionNotes");
+            entity.Property(e => e.Status)
+                .HasDefaultValueSql("'NEW'::\"OrderStatus\"")
+                .HasColumnName("status");
             entity.Property(e => e.TotalAmount).HasColumnName("totalAmount");
             entity.Property(e => e.UpdatedAt)
                 .HasColumnType("timestamp(3) without time zone")
