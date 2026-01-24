@@ -40,6 +40,7 @@ namespace Backend.Controllers
                 OrderItems = o.OrderItems.Select(oi => new OrderItemDto
                 {
                     Id = oi.Id,
+                    BatchId = oi.BatchId,
                     Quantity = oi.Quantity,
                     Price = oi.Price,
                     BatchNumber = oi.Batch.BatchNumber 

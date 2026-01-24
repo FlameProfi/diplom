@@ -22,24 +22,70 @@ namespace Backend.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<InventoryMovement>>> GetAll()
+        public async Task<ActionResult<IEnumerable<InventoryMovementSummaryDto>>> GetAll()
         {
-            var items = await _context.InventoryMovements.ToListAsync();
-            return Ok(items);
+            var items = await _context.InventoryMovements
+                .Include(m => m.Batch)
+                .Include(m => m.FromWarehouse)
+                .Include(m => m.ToWarehouse)
+                .Include(m => m.User)
+                .OrderByDescending(m => m.Date)
+                .ToListAsync();
+
+            var dtos = items.Select(m => new InventoryMovementSummaryDto
+            {
+                Id = m.Id,
+                BatchId = m.BatchId,
+                BatchNumber = m.Batch.BatchNumber,
+                Type = m.Type,
+                Quantity = m.Quantity,
+                Date = m.Date,
+                Reason = m.Reason,
+                UserId = m.UserId,
+                UserEmail = m.User?.Email ?? "system",
+                FromWarehouseId = m.FromWarehouseId,
+                FromWarehouseName = m.FromWarehouse?.Name,
+                ToWarehouseId = m.ToWarehouseId,
+                ToWarehouseName = m.ToWarehouse?.Name
+            }).ToList();
+
+            return Ok(dtos);
         }
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<InventoryMovement>> GetById(string id)
+        public async Task<ActionResult<InventoryMovementSummaryDto>> GetById(string id)
         {
-            var item = await _context.InventoryMovements.FindAsync(id);
+            var item = await _context.InventoryMovements
+                .Include(m => m.Batch)
+                .Include(m => m.FromWarehouse)
+                .Include(m => m.ToWarehouse)
+                .Include(m => m.User)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (item == null)
             {
                 return NotFound();
             }
 
-            return Ok(item);
+            var dto = new InventoryMovementSummaryDto
+            {
+                Id = item.Id,
+                BatchId = item.BatchId,
+                BatchNumber = item.Batch.BatchNumber,
+                Type = item.Type,
+                Quantity = item.Quantity,
+                Date = item.Date,
+                Reason = item.Reason,
+                UserId = item.UserId,
+                UserEmail = item.User?.Email ?? "system",
+                FromWarehouseId = item.FromWarehouseId,
+                FromWarehouseName = item.FromWarehouse?.Name,
+                ToWarehouseId = item.ToWarehouseId,
+                ToWarehouseName = item.ToWarehouse?.Name
+            };
+
+            return Ok(dto);
         }
 
         [HttpPost]
