@@ -27,6 +27,14 @@ const DashboardPage = () => {
     },
   })
 
+  const { data: contracts = [], isLoading: contractsLoading, error: contractsError } = useQuery({
+    queryKey: ['dashboard', 'contracts'],
+    queryFn: async () => {
+      const res = await api.get('/contracts')
+      return res.data
+    },
+  })
+
   const { data: stock = [], isLoading: stockLoading, error: stockError } = useQuery({
     queryKey: ['dashboard', 'stock'],
     queryFn: async () => {
@@ -35,14 +43,44 @@ const DashboardPage = () => {
     },
   })
 
-  const isLoading = batchesLoading || ordersLoading || customersLoading || stockLoading
-  const hasError = batchesError || ordersError || customersError || stockError
+  const { data: movements = [], isLoading: movementsLoading, error: movementsError } = useQuery({
+    queryKey: ['dashboard', 'movements'],
+    queryFn: async () => {
+      const res = await api.get('/inventory-movements')
+      return res.data
+    },
+  })
+
+  const isLoading = batchesLoading || ordersLoading || customersLoading || stockLoading || contractsLoading || movementsLoading
+  const hasError = batchesError || ordersError || customersError || stockError || contractsError || movementsError
 
   const totalStock = stock.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0)
   const reservedStock = stock.reduce((sum: number, item: any) => sum + (item.reserved || 0), 0)
 
   const activeBatches = batches.filter((batch: any) => batch.status === 'ACTIVE').length
   const pendingOrders = orders.filter((order: any) => order.status === 'NEW').length
+  const activeContracts = contracts.filter((contract: any) => String(contract.status || '').toUpperCase() === 'ACTIVE').length
+
+  const recentCustomers = [...customers]
+    .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 5)
+
+  const movementTypeLabels: Record<string, string> = {
+    RECEIPT: 'Приход',
+    ISSUE: 'Расход',
+    RESERVE: 'Резерв',
+  }
+
+  const recentMovements = [...movements]
+    .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 5)
+
+  const formatDate = (value?: string) => {
+    if (!value) return '—'
+    const date = new Date(value)
+    if (Number.isNaN(date.getTime())) return '—'
+    return date.toLocaleDateString('ru-RU')
+  }
 
   if (isLoading) {
     return <div className="dashboard-state">Загрузка данных...</div>
@@ -73,7 +111,12 @@ const DashboardPage = () => {
         <div className="summary-card">
           <p className="summary-label">Клиенты</p>
           <h2>{customers.length}</h2>
-          <span className="summary-meta">Активные контракты</span>
+          <span className="summary-meta">Активных контрактов: {activeContracts}</span>
+        </div>
+        <div className="summary-card">
+          <p className="summary-label">Контракты</p>
+          <h2>{contracts.length}</h2>
+          <span className="summary-meta">В работе: {activeContracts}</span>
         </div>
       </section>
 
@@ -117,6 +160,57 @@ const DashboardPage = () => {
               </div>
             ))}
             {orders.length === 0 && <p className="empty-state">Заказы не найдены</p>}
+          </div>
+        </div>
+
+        <div className="panel">
+          <div className="panel-header">
+            <h3>Новые клиенты</h3>
+            <span>Последние регистрации</span>
+          </div>
+          <div className="panel-body">
+            {recentCustomers.map((customer: any) => (
+              <div key={customer.id} className="panel-row">
+                <div>
+                  <p className="row-title">{customer.name}</p>
+                  <span className="row-subtitle">
+                    {customer.region || customer.country || 'Регион не указан'}
+                  </span>
+                </div>
+                <div className="panel-amount">
+                  {formatDate(customer.createdAt)}
+                </div>
+              </div>
+            ))}
+            {recentCustomers.length === 0 && <p className="empty-state">Клиенты не найдены</p>}
+          </div>
+        </div>
+
+        <div className="panel">
+          <div className="panel-header">
+            <h3>Движения на складе</h3>
+            <span>Последние операции</span>
+          </div>
+          <div className="panel-body">
+            {recentMovements.map((movement: any) => {
+              const relatedBatch = batches.find((batch: any) => batch.id === movement.batchId)
+              const unit = relatedBatch?.unit || relatedBatch?.productType?.unit
+              const typeKey = String(movement.type || '').toUpperCase()
+              return (
+                <div key={movement.id} className="panel-row">
+                  <div>
+                    <p className="row-title">{relatedBatch?.batchNumber || movement.batchId}</p>
+                    <span className="row-subtitle">
+                      {movementTypeLabels[typeKey] || movement.type} · {formatDate(movement.date)}
+                    </span>
+                  </div>
+                  <div className={`panel-tag tag-${typeKey.toLowerCase()}`}>
+                    {movement.quantity} {unit || ''}
+                  </div>
+                </div>
+              )
+            })}
+            {recentMovements.length === 0 && <p className="empty-state">Операции не найдены</p>}
           </div>
         </div>
       </section>
