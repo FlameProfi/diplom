@@ -70,39 +70,71 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Order>> CreateOrder(Order order)
+        public async Task<ActionResult<Order>> CreateOrder([FromBody] OrderCreateDto orderData)
         {
-            if (order == null)
+            if (orderData == null)
             {
                 return BadRequest("Order payload is required.");
             }
 
-            order.Status = string.IsNullOrWhiteSpace(order.Status) ? "NEW" : order.Status.Trim();
-            if (!AllowedStatuses.Contains(order.Status))
+            if (string.IsNullOrWhiteSpace(orderData.OrderNumber))
+            {
+                return BadRequest("Order number is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(orderData.CustomerId))
+            {
+                return BadRequest("Customer is required.");
+            }
+
+            var status = string.IsNullOrWhiteSpace(orderData.Status) ? "NEW" : orderData.Status.Trim();
+            if (!AllowedStatuses.Contains(status))
             {
                 return BadRequest("Invalid order status.");
             }
 
-            order.Currency = string.IsNullOrWhiteSpace(order.Currency) ? "RUB" : order.Currency.Trim();
+            var order = new Order
+            {
+                OrderNumber = orderData.OrderNumber.Trim(),
+                CustomerId = orderData.CustomerId.Trim(),
+                Status = status.ToUpperInvariant(),
+                Currency = "RUB",
+                TotalAmount = orderData.TotalAmount,
+                ExpectedDelivery = orderData.ExpectedDelivery,
+                ProductionNotes = orderData.ProductionNotes,
+                PackingNotes = orderData.PackingNotes,
+                OrderItems = new List<OrderItem>()
+            };
+
             EntityDefaults.ApplyCreationDefaults(order);
 
-            if (order.OrderItems == null)
-            {
-                order.OrderItems = new List<OrderItem>();
-            }
-
-            foreach (var item in order.OrderItems)
-            {
-                EntityDefaults.ApplyCreationDefaults(item);
-                if (string.IsNullOrWhiteSpace(item.OrderId))
-                {
-                    item.OrderId = order.Id;
-                }
-            }
-
-            if (!order.OrderItems.Any())
+            if (orderData.OrderItems == null || !orderData.OrderItems.Any())
             {
                 return BadRequest("Order must contain at least one item.");
+            }
+
+            foreach (var item in orderData.OrderItems)
+            {
+                if (string.IsNullOrWhiteSpace(item.BatchId))
+                {
+                    return BadRequest("Order item batch is required.");
+                }
+
+                if (!item.Quantity.HasValue || item.Quantity <= 0)
+                {
+                    return BadRequest("Order item quantity must be greater than zero.");
+                }
+
+                var orderItem = new OrderItem
+                {
+                    BatchId = item.BatchId.Trim(),
+                    Quantity = item.Quantity.Value,
+                    Price = item.Price,
+                    OrderId = order.Id
+                };
+
+                EntityDefaults.ApplyCreationDefaults(orderItem);
+                order.OrderItems.Add(orderItem);
             }
 
             if (order.TotalAmount is null || order.TotalAmount <= 0)
