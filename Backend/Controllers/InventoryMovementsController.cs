@@ -124,12 +124,15 @@ namespace Backend.Controllers
                     stockItem.Quantity += request.Quantity;
                     break;
                 case "ISSUE":
-                    var available = stockItem.Quantity - stockItem.Reserved;
-                    if (request.Quantity > available)
+                    if (request.Quantity > stockItem.Quantity)
                     {
-                        return BadRequest(new { Message = $"Недостаточно доступного остатка: {available}" });
+                        return BadRequest(new { Message = $"Недостаточно остатка: {stockItem.Quantity}" });
                     }
                     stockItem.Quantity -= request.Quantity;
+                    if (stockItem.Reserved > stockItem.Quantity)
+                    {
+                        stockItem.Reserved = stockItem.Quantity;
+                    }
                     break;
                 case "RESERVE":
                     if (request.Quantity > stockItem.Quantity - stockItem.Reserved)
@@ -147,8 +150,8 @@ namespace Backend.Controllers
             var movement = new InventoryMovement
             {
                 BatchId = batch.Id,
-                FromWarehouseId = request.FromWarehouseId,
-                ToWarehouseId = request.ToWarehouseId,
+                FromWarehouseId = request.Type == "ISSUE" ? request.FromWarehouseId ?? warehouse.Id : request.FromWarehouseId,
+                ToWarehouseId = request.Type != "ISSUE" ? request.ToWarehouseId ?? warehouse.Id : request.ToWarehouseId,
                 Quantity = request.Quantity,
                 Reason = request.Reason,
                 UserId = request.UserId ?? "system",
