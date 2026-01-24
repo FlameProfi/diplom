@@ -29,12 +29,20 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrders()
+        public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrders([FromQuery] string? customerId)
         {
-            var orders = await _context.Orders
+            var query = _context.Orders
               .Include(o => o.Customer)
               .Include(o => o.OrderItems)
               .ThenInclude(oi => oi.Batch)
+              .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(customerId))
+            {
+                query = query.Where(o => o.CustomerId == customerId);
+            }
+
+            var orders = await query
               .OrderByDescending(o => o.CreatedAt)
               .ToListAsync();
 

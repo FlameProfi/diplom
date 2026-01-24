@@ -99,16 +99,41 @@ const CustomersPage = () => {
 
       {showForm && (
         <form onSubmit={handleSubmit(onSubmit)} className="customer-form">
-          <input {...register('name')} placeholder="Название клиента" required />
-          <input {...register('email')} placeholder="Email" type="email" />
-          <input {...register('phone')} placeholder="Телефон" />
-          <input {...register('region')} placeholder="Регион" />
-          <input {...register('country')} placeholder="Страна" />
-          <input {...register('address')} placeholder="Адрес" />
-          <input {...register('taxId')} placeholder="Налоговый ID" />
-          <button type="submit" className="btn btn-success" disabled={createMutation.isPending}>
-            {createMutation.isPending ? 'Создаётся...' : 'Создать клиента'}
-          </button>
+          <div className="form-grid">
+            <div className="form-field">
+              <label htmlFor="customer-name">Название клиента</label>
+              <input id="customer-name" {...register('name')} placeholder="ООО МеталлПром" required />
+            </div>
+            <div className="form-field">
+              <label htmlFor="customer-email">Email</label>
+              <input id="customer-email" {...register('email')} placeholder="mail@example.com" type="email" />
+            </div>
+            <div className="form-field">
+              <label htmlFor="customer-phone">Телефон</label>
+              <input id="customer-phone" {...register('phone')} placeholder="+7 (999) 000-00-00" />
+            </div>
+            <div className="form-field">
+              <label htmlFor="customer-region">Регион</label>
+              <input id="customer-region" {...register('region')} placeholder="Московская область" />
+            </div>
+            <div className="form-field">
+              <label htmlFor="customer-country">Страна</label>
+              <input id="customer-country" {...register('country')} placeholder="Россия" />
+            </div>
+            <div className="form-field full">
+              <label htmlFor="customer-address">Адрес</label>
+              <input id="customer-address" {...register('address')} placeholder="Адрес доставки или офиса" />
+            </div>
+            <div className="form-field">
+              <label htmlFor="customer-tax">Налоговый ID</label>
+              <input id="customer-tax" {...register('taxId')} placeholder="ИНН/КПП" />
+            </div>
+          </div>
+          <div className="form-actions">
+            <button type="submit" className="btn btn-success" disabled={createMutation.isPending}>
+              {createMutation.isPending ? 'Создаётся...' : 'Создать клиента'}
+            </button>
+          </div>
         </form>
       )}
 

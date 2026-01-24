@@ -19,18 +19,53 @@
   }
 
   .customer-form {
-    display: grid;
-    gap: 1rem;
-    max-width: 500px;
+    max-width: 840px;
     margin-bottom: 2rem;
-    padding: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    padding: 1.5rem;
+    border-radius: 16px;
+    border: 1px solid #e3e7ee;
+    background: #fff;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
 
-    input {
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+    .form-grid {
+      display: grid;
+      gap: 1rem 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      &.full {
+        grid-column: 1 / -1;
+      }
+
+      label {
+        font-weight: 600;
+        color: #1f2937;
+      }
+
+      input {
+        padding: 0.65rem 0.75rem;
+        border: 1px solid #d0d7e2;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+        &:focus {
+          outline: none;
+          border-color: #4f46e5;
+          box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+      }
+    }
+
+    .form-actions {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: flex-end;
     }
   }
 

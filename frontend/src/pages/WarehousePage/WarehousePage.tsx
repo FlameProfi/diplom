@@ -330,6 +330,7 @@ const WarehousePage = () => {
       return api.post('/inventory-movements/reserve', data)
     },
     onSuccess: () => {
+      refetchBatch()
       queryClient.invalidateQueries({ queryKey: ['stock'] })
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
       queryClient.invalidateQueries({ queryKey: ['inventory-movements'] })
