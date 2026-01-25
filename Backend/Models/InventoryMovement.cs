@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Backend.Models.DTO;
+using System;
 using System.Collections.Generic;
 
 namespace Backend.Models;
@@ -15,7 +16,7 @@ public partial class InventoryMovement
 
     public double Quantity { get; set; }
 
-    public string Type { get; set; } = null!;
+    public MovementType Type { get; set; }
 
     public DateTime Date { get; set; }
 

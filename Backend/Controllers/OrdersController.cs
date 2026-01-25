@@ -1,6 +1,7 @@
 ﻿using Backend.Infrastructure;
 using Backend.Models;
 using Backend.Models.DTO;
+using Backend.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,17 +11,6 @@ namespace Backend.Controllers
     [ApiController]
     public class OrdersController : ControllerBase
     {
-        private static readonly HashSet<string> AllowedStatuses = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "NEW",
-            "IN_PRODUCTION",
-            "PACKED",
-            "READY_FOR_SHIPMENT",
-            "SHIPPED",
-            "DELIVERED",
-            "CANCELLED",
-        };
-
         private readonly AppDbContext _context;
 
         public OrdersController(AppDbContext context)
@@ -50,7 +40,7 @@ namespace Backend.Controllers
             {
                 Id = o.Id,
                 OrderNumber = o.OrderNumber,
-                Status = o.Status,
+                Status = o.Status.ToString(),
                 TotalAmount = o.TotalAmount,
                 CreatedAt = o.CreatedAt,
                 ExpectedDelivery = o.ExpectedDelivery,
@@ -87,24 +77,23 @@ namespace Backend.Controllers
                 return BadRequest("Customer is required.");
             }
 
-            var status = string.IsNullOrWhiteSpace(orderData.Status) ? "NEW" : orderData.Status.Trim();
-            if (!AllowedStatuses.Contains(status))
-            {
-                return BadRequest("Invalid order status.");
-            }
+            if (!Enum.TryParse<OrderStatus>(orderData.Status, ignoreCase: true, out var parsed))
+                return BadRequest(new { Message = "Неверный статус заказа" });
 
             var order = new Order
             {
                 OrderNumber = orderData.OrderNumber.Trim(),
                 CustomerId = orderData.CustomerId.Trim(),
-                Status = status.ToUpperInvariant(),
+                Status = parsed,
                 Currency = "RUB",
                 TotalAmount = orderData.TotalAmount,
-                ExpectedDelivery = orderData.ExpectedDelivery,
+                ExpectedDelivery = EnsureUtc.GoEnsureUtc((DateTime)orderData.ExpectedDelivery),
                 ProductionNotes = orderData.ProductionNotes,
                 PackingNotes = orderData.PackingNotes,
                 OrderItems = new List<OrderItem>()
             };
+            order.CreatedAt = DateTime.UtcNow;
+            order.UpdatedAt = DateTime.UtcNow;
 
             EntityDefaults.ApplyCreationDefaults(order);
 
@@ -145,21 +134,41 @@ namespace Backend.Controllers
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetOrders), new { id = order.Id }, order);
+            var result = new OrderDto
+            {
+                Id = order.Id,
+                OrderNumber = order.OrderNumber,
+                CustomerId = order.CustomerId,
+                Status = order.Status.ToString(),      // <- важно
+                Currency = order.Currency,
+                TotalAmount = order.TotalAmount ?? 0,
+                CreatedAt = order.CreatedAt,
+                UpdatedAt = order.UpdatedAt,
+                ExpectedDelivery = order.ExpectedDelivery,
+                ProductionNotes = order.ProductionNotes,
+                PackingNotes = order.PackingNotes,
+                OrderItems = order.OrderItems.Select(i => new OrderItemDto
+                {
+                    Id = i.Id,
+                    BatchId = i.BatchId,
+                    Quantity = i.Quantity,
+                    Price = i.Price
+                }).ToList()
+            };
+
+            return CreatedAtAction(nameof(GetOrders), new { id = order.Id }, result);
         }
 
         [HttpPatch("{id}/status/{status}")]
         public async Task<IActionResult> UpdateOrderStatus(string id, string status)
         {
-            if (!AllowedStatuses.Contains(status))
-            {
-                return BadRequest("Invalid order status.");
-            }
+            if (!Enum.TryParse<OrderStatus>(status, ignoreCase: true, out var parsed))
+                return BadRequest(new { Message = "Неверный статус заказа" });
 
             var order = await _context.Orders.FindAsync(id);
             if (order == null) return NotFound();
 
-            order.Status = status.ToUpperInvariant();
+            order.Status = parsed;
             EntityDefaults.ApplyUpdateDefaults(order);
 
             await _context.SaveChangesAsync();

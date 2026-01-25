@@ -260,12 +260,22 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "201": {
+            "description": "Created",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Batch"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -295,6 +305,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BatchDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -334,6 +354,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BatchDetailDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -384,8 +414,28 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -426,11 +476,14 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Batch"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -496,6 +549,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BatchDocumentDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -2712,17 +2775,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Order"
+                "$ref": "#/components/schemas/OrderCreateDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Order"
+                "$ref": "#/components/schemas/OrderCreateDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Order"
+                "$ref": "#/components/schemas/OrderCreateDto"
               }
             }
           }
@@ -5003,8 +5066,7 @@
             "format": "double"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "$ref": "#/components/schemas/MovementType"
           },
           "date": {
             "type": "string",
@@ -5275,6 +5337,17 @@
         },
         "additionalProperties": false
       },
+      "MovementType": {
+        "enum": [
+          "Receipt",
+          "Issue",
+          "Reserve",
+          "Write_OFF",
+          "Transfer",
+          "Consumption"
+        ],
+        "type": "string"
+      },
       "Notification": {
         "type": "object",
         "properties": {
@@ -5332,8 +5405,7 @@
             "nullable": true
           },
           "status": {
-            "type": "string",
-            "nullable": true
+            "$ref": "#/components/schemas/OrderStatus"
           },
           "createdAt": {
             "type": "string",
@@ -5390,6 +5462,49 @@
         },
         "additionalProperties": false
       },
+      "OrderCreateDto": {
+        "type": "object",
+        "properties": {
+          "orderNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "customerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalAmount": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "expectedDelivery": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "productionNotes": {
+            "type": "string",
+            "nullable": true
+          },
+          "packingNotes": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemCreateDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "OrderDto": {
         "type": "object",
         "properties": {
@@ -5433,6 +5548,26 @@
               "$ref": "#/components/schemas/OrderItemDto"
             },
             "nullable": true
+          },
+          "productionNotes": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "packingNotes": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -5470,6 +5605,26 @@
         },
         "additionalProperties": false
       },
+      "OrderItemCreateDto": {
+        "type": "object",
+        "properties": {
+          "batchId": {
+            "type": "string",
+            "nullable": true
+          },
+          "quantity": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "price": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "OrderItemDto": {
         "type": "object",
         "properties": {
@@ -5496,6 +5651,18 @@
           }
         },
         "additionalProperties": false
+      },
+      "OrderStatus": {
+        "enum": [
+          "New",
+          "IN_PRODUCTION",
+          "PACKED",
+          "READY_FOR_SHIPMENT",
+          "SHIPPED",
+          "DELIVERED",
+          "CANCELLED"
+        ],
+        "type": "string"
       },
       "Payment": {
         "type": "object",

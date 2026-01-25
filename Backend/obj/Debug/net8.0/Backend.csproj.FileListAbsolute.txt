@@ -138,4 +138,3 @@ D:\diplom\Backend\obj\Debug\net8.0\refint\Backend.dll
 D:\diplom\Backend\obj\Debug\net8.0\Backend.pdb
 D:\diplom\Backend\obj\Debug\net8.0\Backend.genruntimeconfig.cache
 D:\diplom\Backend\obj\Debug\net8.0\ref\Backend.dll
-D:\diplom\Backend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

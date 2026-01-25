@@ -98,7 +98,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.EntityType).HasColumnName("entityType");
             entity.Property(e => e.Timestamp)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("timestamp");
             entity.Property(e => e.UserId).HasColumnName("userId");
 
@@ -129,10 +129,10 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.BatchNumber).HasColumnName("batchNumber");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("createdAt");
             entity.Property(e => e.ExpiryDate)
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("expiryDate");
             entity.Property(e => e.ExportMarking).HasColumnName("exportMarking");
             entity.Property(e => e.MinStock)
@@ -144,7 +144,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("parameters");
             entity.Property(e => e.ProductTypeId).HasColumnName("productTypeId");
             entity.Property(e => e.ProductionDate)
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("productionDate");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
             entity.Property(e => e.Status)
@@ -152,7 +152,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("status");
             entity.Property(e => e.Unit).HasColumnName("unit");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("updatedAt");
 
             entity.HasOne(d => d.ProductType).WithMany(p => p.Batches)
@@ -180,7 +180,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("oldValue");
             entity.Property(e => e.Timestamp)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("timestamp");
             entity.Property(e => e.UserId).HasColumnName("userId");
 
@@ -207,7 +207,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.BatchId).HasColumnName("batchId");
             entity.Property(e => e.Date)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("date");
             entity.Property(e => e.MaterialId).HasColumnName("materialId");
             entity.Property(e => e.Notes).HasColumnName("notes");
@@ -237,11 +237,11 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CustomerId).HasColumnName("customerId");
             entity.Property(e => e.EndDate)
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("endDate");
             entity.Property(e => e.Number).HasColumnName("number");
             entity.Property(e => e.StartDate)
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("startDate");
             entity.Property(e => e.Status)
                 .HasDefaultValueSql("'ACTIVE'::text")
@@ -267,7 +267,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Country).HasColumnName("country");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("createdAt");
             entity.Property(e => e.Email).HasColumnName("email");
             entity.Property(e => e.Name).HasColumnName("name");
@@ -275,7 +275,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Region).HasColumnName("region");
             entity.Property(e => e.TaxId).HasColumnName("taxId");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("updatedAt");
             entity.Property(e => e.UserId).HasColumnName("userId");
 
@@ -296,12 +296,12 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.BatchId).HasColumnName("batchId");
             entity.Property(e => e.ExpiryDate)
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("expiryDate");
             entity.Property(e => e.FilePath).HasColumnName("filePath");
             entity.Property(e => e.IssuedDate)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("issuedDate");
             entity.Property(e => e.Type).HasColumnName("type");
             entity.Property(e => e.Version).HasColumnName("version");
@@ -324,7 +324,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.BatchId).HasColumnName("batchId");
             entity.Property(e => e.Date)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("date");
             entity.Property(e => e.FromWarehouseId).HasColumnName("fromWarehouseId");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
@@ -371,11 +371,11 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("currency");
             entity.Property(e => e.CustomerId).HasColumnName("customerId");
             entity.Property(e => e.DueDate)
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("dueDate");
             entity.Property(e => e.IssueDate)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("issueDate");
             entity.Property(e => e.Number).HasColumnName("number");
             entity.Property(e => e.OrderId).HasColumnName("orderId");
@@ -404,7 +404,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.BatchId).HasColumnName("batchId");
             entity.Property(e => e.Date)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("date");
             entity.Property(e => e.LabNotes).HasColumnName("labNotes");
             entity.Property(e => e.Parameters)
@@ -426,7 +426,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("createdAt");
             entity.Property(e => e.MinStock).HasColumnName("minStock");
             entity.Property(e => e.Name).HasColumnName("name");
@@ -444,7 +444,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("createdAt");
             entity.Property(e => e.IsRead)
                 .HasDefaultValue(false)
@@ -470,14 +470,14 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("createdAt");
             entity.Property(e => e.Currency)
                 .HasDefaultValueSql("'RUB'::text")
                 .HasColumnName("currency");
             entity.Property(e => e.CustomerId).HasColumnName("customerId");
             entity.Property(e => e.ExpectedDelivery)
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("expectedDelivery");
             entity.Property(e => e.OrderNumber).HasColumnName("orderNumber");
             entity.Property(e => e.PackingNotes).HasColumnName("packingNotes");
@@ -487,7 +487,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("status");
             entity.Property(e => e.TotalAmount).HasColumnName("totalAmount");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("updatedAt");
             entity.Property(e => e.UserId).HasColumnName("userId");
 
@@ -537,7 +537,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Amount).HasColumnName("amount");
             entity.Property(e => e.Date)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("date");
             entity.Property(e => e.InvoiceId).HasColumnName("invoiceId");
             entity.Property(e => e.Method).HasColumnName("method");
@@ -598,7 +598,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Cost).HasColumnName("cost");
             entity.Property(e => e.Date)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("date");
             entity.Property(e => e.InvoiceRef).HasColumnName("invoiceRef");
             entity.Property(e => e.MaterialId).HasColumnName("materialId");
@@ -632,23 +632,23 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.ActualDate)
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("actualDate");
             entity.Property(e => e.Carrier).HasColumnName("carrier");
             entity.Property(e => e.Cost).HasColumnName("cost");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("createdAt");
             entity.Property(e => e.EstimatedDate)
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("estimatedDate");
             entity.Property(e => e.FromWarehouseId).HasColumnName("fromWarehouseId");
             entity.Property(e => e.Notes).HasColumnName("notes");
             entity.Property(e => e.OrderId).HasColumnName("orderId");
             entity.Property(e => e.TrackingNumber).HasColumnName("trackingNumber");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("updatedAt");
 
             entity.HasOne(d => d.FromWarehouse).WithMany(p => p.Shipments)
@@ -676,12 +676,12 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.BatchId).HasColumnName("batchId");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("createdAt");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
             entity.Property(e => e.Reserved).HasColumnName("reserved");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("updatedAt");
             entity.Property(e => e.WarehouseId).HasColumnName("warehouseId");
 
@@ -720,7 +720,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("createdAt");
             entity.Property(e => e.Email).HasColumnName("email");
             entity.Property(e => e.Name).HasColumnName("name");
@@ -729,7 +729,7 @@ public partial class AppDbContext : DbContext
                 .HasDefaultValueSql("'RU'::text")
                 .HasColumnName("preferredLanguage");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp(3) without time zone")
+                .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("updatedAt");
         });
 

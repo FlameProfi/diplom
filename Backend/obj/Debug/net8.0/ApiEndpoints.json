@@ -193,7 +193,14 @@
         "MediaTypes": [
           "application/json"
         ],
-        "StatusCode": 200
+        "StatusCode": 201
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 400
       }
     ]
   },
@@ -224,6 +231,13 @@
         "MediaTypes": [
           "application/json"
         ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
         "StatusCode": 404
       }
     ]
@@ -247,7 +261,27 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 204
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
   },
   {
     "ContainingType": "Backend.Controllers.BatchesController",
@@ -286,6 +320,13 @@
         "MediaTypes": [
           "application/json"
         ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
         "StatusCode": 404
       }
     ]
@@ -311,11 +352,16 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "Backend.Models.Batch",
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
         "MediaTypes": [
           "application/json"
         ],
-        "StatusCode": 200
+        "StatusCode": 400
       },
       {
         "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
@@ -347,6 +393,13 @@
           "application/json"
         ],
         "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 400
       },
       {
         "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
@@ -1985,8 +2038,8 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "order",
-        "Type": "Backend.Models.Order",
+        "Name": "orderData",
+        "Type": "Backend.Models.DTO.OrderCreateDto",
         "IsRequired": true
       }
     ],

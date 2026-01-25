@@ -37,7 +37,7 @@ namespace Backend.Controllers
                 Id = m.Id,
                 BatchId = m.BatchId,
                 BatchNumber = m.Batch.BatchNumber,
-                Type = m.Type,
+                Type = m.Type.ToString(),
                 Quantity = m.Quantity,
                 Date = m.Date,
                 Reason = m.Reason,
@@ -63,17 +63,16 @@ namespace Backend.Controllers
                 .Include(m => m.ToWarehouse)
                 .Include(m => m.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (item == null)
-            {
                 return NotFound();
-            }
 
             var dto = new InventoryMovementSummaryDto
             {
                 Id = item.Id,
                 BatchId = item.BatchId,
                 BatchNumber = item.Batch.BatchNumber,
-                Type = item.Type,
+                Type = item.Type.ToString(),
                 Quantity = item.Quantity,
                 Date = item.Date,
                 Reason = item.Reason,
@@ -94,53 +93,57 @@ namespace Backend.Controllers
         public async Task<ActionResult<InventoryMovement>> Create(InventoryMovementRequestDto request)
         {
             if (request.Quantity <= 0)
-            {
                 return BadRequest(new { Message = "Количество должно быть больше 0" });
-            }
+
+            if (string.IsNullOrWhiteSpace(request.BatchId))
+                return BadRequest(new { Message = "BatchId обязателен" });
+
+            if (string.IsNullOrWhiteSpace(request.Type))
+                return BadRequest(new { Message = "Type обязателен" });
 
             var batch = await _context.Batches
                 .Include(b => b.StockItems)
                 .FirstOrDefaultAsync(b => b.Id == request.BatchId);
+
             if (batch == null)
-            {
                 return BadRequest(new { Message = "Партия не найдена" });
-            }
+
+            // Parse string -> enum (оптимально для PG enum)
+            if (!Enum.TryParse<MovementType>(request.Type, ignoreCase: true, out var movementType))
+                return BadRequest(new { Message = "Неверный тип движения" });
 
             var warehouse = await ResolveWarehouseAsync(request, batch);
             if (warehouse == null)
-            {
                 return BadRequest(new { Message = "Не удалось определить склад" });
-            }
 
             var stockItem = await GetOrCreateStockItemAsync(batch.Id, warehouse.Id);
             if (batch.StockItems.All(s => s.Id != stockItem.Id))
-            {
                 batch.StockItems.Add(stockItem);
-            }
 
-            switch (request.Type)
+            // Логика движения — по enum (без строковой каши)
+            switch (movementType)
             {
-                case "RECEIPT":
+                case MovementType.Receipt:
                     stockItem.Quantity += request.Quantity;
                     break;
-                case "ISSUE":
+
+                case MovementType.Issue:
                     if (request.Quantity > stockItem.Quantity)
-                    {
                         return BadRequest(new { Message = $"Недостаточно остатка: {stockItem.Quantity}" });
-                    }
+
                     stockItem.Quantity -= request.Quantity;
+
                     if (stockItem.Reserved > stockItem.Quantity)
-                    {
                         stockItem.Reserved = stockItem.Quantity;
-                    }
                     break;
-                case "RESERVE":
+
+                case MovementType.Reserve:
                     if (request.Quantity > stockItem.Quantity - stockItem.Reserved)
-                    {
                         return BadRequest(new { Message = "Недостаточно доступного остатка для резерва" });
-                    }
+
                     stockItem.Reserved += request.Quantity;
                     break;
+
                 default:
                     return BadRequest(new { Message = "Неизвестный тип движения" });
             }
@@ -150,12 +153,22 @@ namespace Backend.Controllers
             var movement = new InventoryMovement
             {
                 BatchId = batch.Id,
-                FromWarehouseId = request.Type == "ISSUE" ? request.FromWarehouseId ?? warehouse.Id : request.FromWarehouseId,
-                ToWarehouseId = request.Type != "ISSUE" ? request.ToWarehouseId ?? warehouse.Id : request.ToWarehouseId,
+
+                // сохраняем прежнюю логику выбора складов
+                FromWarehouseId = movementType == MovementType.Issue
+                    ? request.FromWarehouseId ?? warehouse.Id
+                    : request.FromWarehouseId,
+
+                ToWarehouseId = movementType != MovementType.Issue
+                    ? request.ToWarehouseId ?? warehouse.Id
+                    : request.ToWarehouseId,
+
                 Quantity = request.Quantity,
                 Reason = request.Reason,
                 UserId = request.UserId ?? "system",
-                Type = request.Type
+
+                // ВАЖНО: enum, не string
+                Type = movementType
             };
 
             EntityDefaults.ApplyCreationDefaults(movement);
@@ -167,7 +180,24 @@ namespace Backend.Controllers
             await CreateLowStockNotificationIfNeeded(batch);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetById), new { id = movement.Id }, movement);
+            var result = new InventoryMovementSummaryDto
+            {
+                Id = movement.Id,
+                BatchId = movement.BatchId,
+                BatchNumber = batch.BatchNumber,
+                Type = movement.Type.ToString(),
+                Quantity = movement.Quantity,
+                Date = movement.Date,
+                Reason = movement.Reason,
+                UserId = movement.UserId,
+                UserEmail = "system",
+                FromWarehouseId = movement.FromWarehouseId,
+                FromWarehouseName = null,
+                ToWarehouseId = movement.ToWarehouseId,
+                ToWarehouseName = null
+            };
+
+            return CreatedAtAction(nameof(GetById), new { id = movement.Id }, result);
         }
 
         [HttpPost("reserve")]
@@ -176,37 +206,30 @@ namespace Backend.Controllers
         public async Task<ActionResult<InventoryMovement>> Reserve(ReserveRequestDto request)
         {
             if (request.Quantity <= 0)
-            {
                 return BadRequest(new { Message = "Количество должно быть больше 0" });
-            }
 
             var orderItem = await _context.OrderItems
                 .Include(oi => oi.Batch)
-                .ThenInclude(b => b.StockItems)
+                    .ThenInclude(b => b.StockItems)
                 .FirstOrDefaultAsync(oi => oi.Id == request.OrderItemId);
+
             if (orderItem == null)
-            {
                 return BadRequest(new { Message = "Позиция заказа не найдена" });
-            }
 
             if (orderItem.BatchId != request.BatchId)
-            {
                 return BadRequest(new { Message = "Партия не совпадает с позицией заказа" });
-            }
 
             var batch = orderItem.Batch;
+
             var warehouse = await GetDefaultWarehouseAsync();
             var stockItem = await GetOrCreateStockItemAsync(batch.Id, warehouse.Id);
+
             if (batch.StockItems.All(s => s.Id != stockItem.Id))
-            {
                 batch.StockItems.Add(stockItem);
-            }
 
             var available = stockItem.Quantity - stockItem.Reserved;
             if (request.Quantity > available)
-            {
                 return BadRequest(new { Message = $"Недостаточно доступного остатка: {available}" });
-            }
 
             stockItem.Reserved += request.Quantity;
             EntityDefaults.ApplyUpdateDefaults(stockItem);
@@ -217,7 +240,7 @@ namespace Backend.Controllers
                 Quantity = request.Quantity,
                 Reason = $"RESERVE_ORDER_ITEM:{orderItem.Id}",
                 UserId = request.UserId ?? "system",
-                Type = "RESERVE",
+                Type = MovementType.Reserve, // enum
                 ToWarehouseId = warehouse.Id
             };
 
@@ -230,7 +253,24 @@ namespace Backend.Controllers
             await CreateLowStockNotificationIfNeeded(batch);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetById), new { id = movement.Id }, movement);
+            var result = new InventoryMovementSummaryDto
+            {
+                Id = movement.Id,
+                BatchId = movement.BatchId,
+                BatchNumber = batch.BatchNumber,
+                Type = movement.Type.ToString(),
+                Quantity = movement.Quantity,
+                Date = movement.Date,
+                Reason = movement.Reason,
+                UserId = movement.UserId,
+                UserEmail = "system",
+                FromWarehouseId = movement.FromWarehouseId,
+                FromWarehouseName = null,
+                ToWarehouseId = movement.ToWarehouseId,
+                ToWarehouseName = null
+            };
+
+            return CreatedAtAction(nameof(GetById), new { id = movement.Id }, result);
         }
 
         [HttpPut("{id}")]
@@ -240,15 +280,11 @@ namespace Backend.Controllers
         public async Task<ActionResult<InventoryMovement>> Update(string id, InventoryMovement item)
         {
             if (id != item.Id)
-            {
                 return BadRequest("ID не совпадает");
-            }
 
             var existing = await _context.InventoryMovements.FindAsync(id);
             if (existing == null)
-            {
                 return NotFound();
-            }
 
             _context.Entry(existing).CurrentValues.SetValues(item);
             EntityDefaults.ApplyUpdateDefaults(existing);
@@ -264,9 +300,7 @@ namespace Backend.Controllers
         {
             var existing = await _context.InventoryMovements.FindAsync(id);
             if (existing == null)
-            {
                 return NotFound();
-            }
 
             _context.InventoryMovements.Remove(existing);
             await _context.SaveChangesAsync();
@@ -277,14 +311,10 @@ namespace Backend.Controllers
         private async Task<Warehouse?> ResolveWarehouseAsync(InventoryMovementRequestDto request, Batch batch)
         {
             if (!string.IsNullOrWhiteSpace(request.ToWarehouseId))
-            {
                 return await _context.Warehouses.FindAsync(request.ToWarehouseId);
-            }
 
             if (!string.IsNullOrWhiteSpace(request.FromWarehouseId))
-            {
                 return await _context.Warehouses.FindAsync(request.FromWarehouseId);
-            }
 
             return await GetDefaultWarehouseAsync();
         }
@@ -293,9 +323,7 @@ namespace Backend.Controllers
         {
             var warehouse = await _context.Warehouses.FirstOrDefaultAsync();
             if (warehouse != null)
-            {
                 return warehouse;
-            }
 
             warehouse = new Warehouse
             {
@@ -303,6 +331,7 @@ namespace Backend.Controllers
                 Name = "Основной склад",
                 Type = "MAIN"
             };
+
             _context.Warehouses.Add(warehouse);
             await _context.SaveChangesAsync();
 
@@ -315,9 +344,7 @@ namespace Backend.Controllers
                 .FirstOrDefaultAsync(s => s.BatchId == batchId && s.WarehouseId == warehouseId);
 
             if (stockItem != null)
-            {
                 return stockItem;
-            }
 
             stockItem = new StockItem
             {
@@ -337,15 +364,11 @@ namespace Backend.Controllers
         private async Task CreateLowStockNotificationIfNeeded(Batch batch)
         {
             if (batch.MinStock is null)
-            {
                 return;
-            }
 
             var total = batch.StockItems.Sum(s => s.Quantity);
             if (total >= batch.MinStock)
-            {
                 return;
-            }
 
             var notification = new Notification
             {

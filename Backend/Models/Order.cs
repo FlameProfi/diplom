@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Backend.Models.DTO;
+using System;
 using System.Collections.Generic;
 
 namespace Backend.Models;
@@ -15,7 +16,7 @@ public partial class Order
 
     public string Currency { get; set; } = null!;
 
-    public string Status { get; set; } = null!;
+    public OrderStatus Status { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

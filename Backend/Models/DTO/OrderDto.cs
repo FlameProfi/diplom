@@ -13,6 +13,10 @@
         public string CustomerName { get; set; } = string.Empty;
 
         public List<OrderItemDto>? OrderItems { get; set; } = new();
+        public string? ProductionNotes { get; internal set; }
+        public string? PackingNotes { get; internal set; }
+        public DateTime UpdatedAt { get; internal set; }
+        public string Currency { get; internal set; }
     }
 
     public class OrderItemDto

@@ -1,9 +1,23 @@
 using Backend.Models;
+using Backend.Models.DTO;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 using Microsoft.Extensions.FileProviders;
+using System.Reflection;
+using System.Text.Json.Serialization;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+{
+    Console.Error.WriteLine("UnhandledException: " + e.ExceptionObject);
+};
+
+TaskScheduler.UnobservedTaskException += (_, e) =>
+{
+    Console.Error.WriteLine("UnobservedTaskException: " + e.Exception);
+    e.SetObserved();
+};
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
@@ -29,13 +43,29 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-  options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+  options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+  o => o
+  .MapEnum<MovementType>("MovementType")
+  .MapEnum<OrderStatus>("OrderStatus")
+  ));
+
+builder.Services.AddControllers()
+    .AddJsonOptions(o =>
+    {
+        o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Metal Factory ERP API v1"));
 }
