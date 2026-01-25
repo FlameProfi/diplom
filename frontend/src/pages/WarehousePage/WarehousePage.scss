@@ -1,24 +1,28 @@
 // src/pages/WarehousePage.scss
 
-$bg-dark: #1a1d24;
-$surface-dark: #2c2f38;
-$border-dark: #404450;
-$text-primary-dark: #eaeaea;
-$text-secondary-dark: #a0a3af;
-$accent-primary: #3a7dff;
-$accent-primary-hover: #5a92ff;
-$accent-success: #28a745;
-$accent-success-hover: #218838;
-$accent-warning: #ffc107;
-$accent-warning-hover: #e0a800;
-$accent-danger: #dc3545;
+$bg-dark: #f3f6fb;
+$surface-dark: #ffffff;
+$surface-muted: #eef2f8;
+$border-dark: #d6deea;
+$text-primary-dark: #1b2430;
+$text-secondary-dark: #5b6b82;
+$accent-primary: #3b82f6;
+$accent-primary-hover: #2563eb;
+$accent-success: #16a34a;
+$accent-success-hover: #15803d;
+$accent-warning: #f59e0b;
+$accent-warning-hover: #d97706;
+$accent-danger: #ef4444;
+$accent-danger-hover: #dc2626;
+$shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.08);
+$shadow-strong: 0 18px 40px rgba(15, 23, 42, 0.12);
 
 .warehouse-page {
   padding: 1.5rem;
   max-width: 1280px;
   margin: 0 auto;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: $bg-dark;
+  background: linear-gradient(180deg, $bg-dark 0%, #eef1f8 100%);
   color: $text-primary-dark;
   min-height: 100vh;
 
@@ -46,6 +50,11 @@ $accent-danger: #dc3545;
     align-items: center;
     margin-bottom: 1.5rem;
     gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border-radius: 16px;
+    background: $surface-dark;
+    border: 1px solid $border-dark;
+    box-shadow: $shadow-soft;
   }
 
   .header-actions {
@@ -57,37 +66,45 @@ $accent-danger: #dc3545;
     border: none;
     cursor: pointer;
     font-weight: 600;
-    border-radius: 6px;
-    padding: 0.65rem 1.25rem;
+    border-radius: 10px;
+    padding: 0.7rem 1.4rem;
     background: $accent-primary;
     color: #fff;
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 8px 18px rgba(59, 130, 246, 0.2);
 
     &:hover {
       background: $accent-primary-hover;
+      transform: translateY(-1px);
+      box-shadow: 0 12px 22px rgba(37, 99, 235, 0.24);
     }
 
     &.ghost {
-      background: transparent;
+      background: $surface-dark;
       border: 1px solid $border-dark;
       color: $text-primary-dark;
+      box-shadow: none;
 
       &:hover {
         border-color: $accent-primary;
         color: $accent-primary;
+        background: $surface-muted;
       }
     }
 
     &.danger {
       background: $accent-danger;
+      box-shadow: 0 8px 18px rgba(239, 68, 68, 0.22);
 
       &:hover {
-        background: darken($accent-danger, 5%);
+        background: $accent-danger-hover;
       }
     }
 
     &:disabled {
-      background: darken($surface-dark, 5%);
+      background: $surface-muted;
+      color: $text-secondary-dark;
+      box-shadow: none;
       cursor: not-allowed;
     }
   }
@@ -95,16 +112,18 @@ $accent-danger: #dc3545;
   input,
   select,
   textarea {
-    padding: 0.6rem 0.75rem;
+    padding: 0.65rem 0.85rem;
     border: 1px solid $border-dark;
     background-color: $surface-dark;
     color: $text-primary-dark;
-    border-radius: 6px;
+    border-radius: 10px;
     width: 100%;
+    box-shadow: inset 0 0 0 1px transparent;
 
     &:focus {
       outline: none;
       border-color: $accent-primary;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
   }
 
@@ -118,19 +137,26 @@ $accent-danger: #dc3545;
     gap: 0.5rem;
     margin-bottom: 1.5rem;
     flex-wrap: wrap;
+    background: $surface-dark;
+    border-radius: 999px;
+    padding: 0.5rem;
+    border: 1px solid $border-dark;
+    box-shadow: $shadow-soft;
 
     button {
       flex: 1;
       min-width: 140px;
-      padding: 0.75rem 1rem;
-      background: $surface-dark;
-      border: 1px solid $border-dark;
+      padding: 0.65rem 1rem;
+      background: transparent;
+      border: none;
       color: $text-secondary-dark;
+      border-radius: 999px;
+      box-shadow: none;
 
       &.active {
         background: $accent-primary;
         color: #fff;
-        border-color: $accent-primary;
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
       }
     }
   }
@@ -144,10 +170,11 @@ $accent-danger: #dc3545;
   .summary-card,
   .movements-section {
     background: $surface-dark;
-    border-radius: 12px;
+    border-radius: 18px;
     padding: 1.5rem;
     border: 1px solid $border-dark;
     margin-bottom: 1rem;
+    box-shadow: $shadow-soft;
   }
 
   .scan-grid {
@@ -160,6 +187,7 @@ $accent-danger: #dc3545;
     margin-top: 1rem;
     display: flex;
     gap: 0.5rem;
+    align-items: center;
 
     input {
       flex: 1;
@@ -210,9 +238,9 @@ $accent-danger: #dc3545;
 
   .stock-badge {
     border: 1px solid $border-dark;
-    border-radius: 6px;
-    padding: 0.5rem 0.75rem;
-    background: $bg-dark;
+    border-radius: 12px;
+    padding: 0.6rem 0.85rem;
+    background: $surface-muted;
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
@@ -242,7 +270,7 @@ $accent-danger: #dc3545;
       border-collapse: collapse;
 
       th {
-        background: lighten($surface-dark, 5%);
+        background: $surface-muted;
         color: $text-primary-dark;
         padding: 0.9rem;
         text-align: left;
@@ -262,7 +290,11 @@ $accent-danger: #dc3545;
       }
 
       tr:hover {
-        background: lighten($surface-dark, 3%);
+        background: $surface-muted;
+      }
+
+      tbody tr:nth-child(odd) {
+        background: #f8fafc;
       }
     }
   }
@@ -312,9 +344,9 @@ $accent-danger: #dc3545;
 
     .notification-item {
       padding: 0.75rem;
-      border: 1px solid darken($accent-warning, 30%);
-      background: rgba($accent-warning, 0.1);
-      border-radius: 6px;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      background: rgba(245, 158, 11, 0.08);
+      border-radius: 12px;
       margin-bottom: 0.5rem;
       color: $text-primary-dark;
     }
@@ -338,9 +370,9 @@ $accent-danger: #dc3545;
       gap: 0.75rem;
 
       div {
-        background: $bg-dark;
+        background: $surface-muted;
         border: 1px solid $border-dark;
-        border-radius: 8px;
+        border-radius: 12px;
         padding: 0.75rem;
         text-align: center;
 
@@ -375,7 +407,7 @@ $accent-danger: #dc3545;
       border-collapse: collapse;
 
       th {
-        background: lighten($surface-dark, 4%);
+        background: $surface-muted;
         color: $text-primary-dark;
         padding: 0.75rem;
         text-align: left;
@@ -386,6 +418,10 @@ $accent-danger: #dc3545;
         padding: 0.75rem;
         border-bottom: 1px solid $border-dark;
         color: $text-secondary-dark;
+      }
+
+      tbody tr:nth-child(odd) {
+        background: #f8fafc;
       }
     }
   }
@@ -414,9 +450,10 @@ $accent-danger: #dc3545;
 
   .auth-required {
     background: $surface-dark;
-    border-radius: 12px;
+    border-radius: 18px;
     padding: 2rem;
     text-align: center;
+    box-shadow: $shadow-soft;
   }
 
   .global-loading {
@@ -427,7 +464,7 @@ $accent-danger: #dc3545;
     color: #fff;
     padding: 0.75rem 1.25rem;
     border-radius: 999px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    box-shadow: $shadow-strong;
   }
 
   @media (max-width: 768px) {
@@ -441,6 +478,7 @@ $accent-danger: #dc3545;
     .header-actions {
       width: 100%;
       justify-content: space-between;
+      flex-wrap: wrap;
     }
 
     .manual-input {
