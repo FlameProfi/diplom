@@ -139,6 +139,54 @@ namespace Backend.Controllers
                 if (batch == null)
                     return BadRequest(new { Message = "Тело запроса пустое" });
 
+                if (string.IsNullOrWhiteSpace(batch.ProductTypeId))
+                    return BadRequest(new { Message = "Тип продукта обязателен" });
+
+                if (batch.Quantity < 0)
+                    return BadRequest(new { Message = "Количество не может быть отрицательным" });
+
+                var productTypeId = batch.ProductTypeId.Trim();
+                var productType = await _context.ProductTypes.FirstOrDefaultAsync(p => p.Id == productTypeId);
+                if (productType == null)
+                    return BadRequest(new { Message = "Тип продукта не найден" });
+
+                batch.ProductTypeId = productTypeId;
+                batch.BatchNumber = batch.BatchNumber?.Trim() ?? string.Empty;
+                batch.Unit = batch.Unit?.Trim() ?? string.Empty;
+                batch.Status = batch.Status?.Trim() ?? string.Empty;
+                batch.Barcode = batch.Barcode?.Trim();
+
+                if (string.IsNullOrWhiteSpace(batch.BatchNumber))
+                {
+                    batch.BatchNumber = await GenerateBatchNumberAsync(productType);
+                }
+                else if (await _context.Batches.AnyAsync(b => b.BatchNumber == batch.BatchNumber))
+                {
+                    return BadRequest(new { Message = "Номер партии уже существует" });
+                }
+
+                if (string.IsNullOrWhiteSpace(batch.Unit))
+                {
+                    batch.Unit = productType.Unit;
+                }
+
+                if (string.IsNullOrWhiteSpace(batch.Unit))
+                    return BadRequest(new { Message = "Единица измерения обязательна" });
+
+                if (string.IsNullOrWhiteSpace(batch.Status))
+                {
+                    batch.Status = "ACTIVE";
+                }
+
+                if (string.IsNullOrWhiteSpace(batch.Barcode))
+                {
+                    batch.Barcode = await GenerateBarcodeAsync();
+                }
+                else if (await _context.Batches.AnyAsync(b => b.Barcode == batch.Barcode))
+                {
+                    return BadRequest(new { Message = "Штрих-код уже используется" });
+                }
+
                 EntityDefaults.ApplyCreationDefaults(batch);
 
                 _context.Batches.Add(batch);
@@ -527,6 +575,45 @@ namespace Backend.Controllers
                         UploadDate = d.IssuedDate
                     }).ToList()
             };
+        }
+
+        private async Task<string> GenerateBatchNumberAsync(ProductType productType)
+        {
+            var prefixSource = productType.Name ?? string.Empty;
+            var prefix = Regex.Replace(prefixSource, "[^A-Za-z0-9]", string.Empty).ToUpperInvariant();
+            if (string.IsNullOrWhiteSpace(prefix))
+            {
+                prefix = "BATCH";
+            }
+
+            if (prefix.Length > 6)
+            {
+                prefix = prefix.Substring(0, 6);
+            }
+
+            var datePart = DateTime.UtcNow.ToString("yyyyMMdd");
+            var baseNumber = $"{prefix}-{datePart}";
+            var sequence = await _context.Batches.CountAsync(b => b.BatchNumber.StartsWith(baseNumber)) + 1;
+            var candidate = $"{baseNumber}-{sequence:D3}";
+
+            while (await _context.Batches.AnyAsync(b => b.BatchNumber == candidate))
+            {
+                sequence += 1;
+                candidate = $"{baseNumber}-{sequence:D3}";
+            }
+
+            return candidate;
+        }
+
+        private async Task<string> GenerateBarcodeAsync()
+        {
+            var candidate = $"BC{Guid.NewGuid():N}".Substring(0, 12);
+            while (await _context.Batches.AnyAsync(b => b.Barcode == candidate))
+            {
+                candidate = $"BC{Guid.NewGuid():N}".Substring(0, 12);
+            }
+
+            return candidate;
         }
 
         private long GetFileSizeSafe(string? filePath)
