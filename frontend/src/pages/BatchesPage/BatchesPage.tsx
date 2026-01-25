@@ -57,6 +57,7 @@ const BatchesPage = () => {
           className="status-filter"
         >
           <option value="ALL">Все статусы</option>
+          <option value="ARRIVED">Прибыла</option>
           <option value="ACTIVE">Активные</option>
           <option value="QUARANTINE">Карантин</option>
           <option value="SHIPPED">Отгружено</option>
@@ -116,6 +117,7 @@ const BatchesPage = () => {
 // Вспомогательная функция
 const getStatusText = (status: string) => {
   const map: Record<string, string> = {
+    ARRIVED: 'Прибыла',
     ACTIVE: 'Активна',
     QUARANTINE: 'Карантин',
     CERTIFIED: 'Сертифицирована',

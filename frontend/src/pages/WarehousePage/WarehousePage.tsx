@@ -119,6 +119,9 @@ const WarehousePage = () => {
   const [movementSearch, setMovementSearch] = useState('')
   const [manualBatch, setManualBatch] = useState<Batch | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [arrivalReason, setArrivalReason] = useState('')
+  const [acceptanceQuantity, setAcceptanceQuantity] = useState(0)
+  const [acceptanceReason, setAcceptanceReason] = useState('')
 
   const isAdmin = !!user && hasPermission(user.role as Role, Role.MANAGER)
 
@@ -216,6 +219,7 @@ const WarehousePage = () => {
   })
 
   const resolvedBatch = manualBatch ?? batch
+  const resolvedStatus = resolvedBatch?.status?.toUpperCase() ?? ''
 
   const orderItems = useMemo<OrderItem[]>(() => {
     if (!orders) return []
@@ -360,6 +364,60 @@ const WarehousePage = () => {
     },
   })
 
+  const arrivalMutation = useMutation({
+    mutationFn: async (data: { batchId: string; reason?: string; userId?: string }) => {
+      return api.post(`/batches/${data.batchId}/arrival`, {
+        reason: data.reason,
+        userId: data.userId,
+      })
+    },
+    onSuccess: () => {
+      refetchBatch()
+      queryClient.invalidateQueries({ queryKey: ['batches'] })
+      setArrivalReason('')
+      alert('Партия отмечена как прибывшая.')
+    },
+    onError: (error: any) => {
+      alert(`Ошибка отметки приезда: ${error.response?.data?.message || error.message}`)
+    },
+    onMutate: () => {
+      setIsLoading(true)
+    },
+    onSettled: () => {
+      setIsLoading(false)
+    },
+  })
+
+  const acceptanceMutation = useMutation({
+    mutationFn: async (data: {
+      batchId: string
+      quantity: number
+      toWarehouseId?: string
+      userId?: string
+      reason?: string
+    }) => {
+      return api.post(`/batches/${data.batchId}/acceptance`, data)
+    },
+    onSuccess: () => {
+      refetchBatch()
+      queryClient.invalidateQueries({ queryKey: ['stock'] })
+      queryClient.invalidateQueries({ queryKey: ['inventory-movements'] })
+      queryClient.invalidateQueries({ queryKey: ['batches'] })
+      setAcceptanceQuantity(0)
+      setAcceptanceReason('')
+      alert('Партия успешно принята на склад.')
+    },
+    onError: (error: any) => {
+      alert(`Ошибка приемки: ${error.response?.data?.message || error.message}`)
+    },
+    onMutate: () => {
+      setIsLoading(true)
+    },
+    onSettled: () => {
+      setIsLoading(false)
+    },
+  })
+
   const handleScan = (scanned: string) => {
     if (!user) {
       alert('Пожалуйста, авторизуйтесь для работы с системой')
@@ -433,6 +491,67 @@ const WarehousePage = () => {
     }
 
     createMovementMutation.mutate(movementPayload)
+  }
+
+  const handleArrival = () => {
+    if (!user) {
+      alert('Пожалуйста, авторизуйтесь для работы с системой')
+      return
+    }
+
+    if (!resolvedBatch) {
+      alert('Сначала выберите партию')
+      return
+    }
+
+    if (resolvedStatus === 'ARRIVED' || resolvedStatus === 'ACTIVE') {
+      alert('Партия уже отмечена как прибывшая или принята')
+      return
+    }
+
+    if (arrivalMutation.isPending) {
+      return
+    }
+
+    arrivalMutation.mutate({
+      batchId: resolvedBatch.id,
+      reason: arrivalReason || `Прибытие партии ${resolvedBatch.batchNumber}`,
+      userId: user.id,
+    })
+  }
+
+  const handleAcceptance = () => {
+    if (!user) {
+      alert('Пожалуйста, авторизуйтесь для работы с системой')
+      return
+    }
+
+    if (!resolvedBatch) {
+      alert('Сначала выберите партию')
+      return
+    }
+
+    if (resolvedStatus !== 'ARRIVED') {
+      alert('Сначала отметьте приезд партии')
+      return
+    }
+
+    if (acceptanceQuantity <= 0) {
+      alert('Введите количество для приемки')
+      return
+    }
+
+    if (acceptanceMutation.isPending) {
+      return
+    }
+
+    acceptanceMutation.mutate({
+      batchId: resolvedBatch.id,
+      quantity: acceptanceQuantity,
+      toWarehouseId: selectedWarehouseId || undefined,
+      userId: user.id,
+      reason: acceptanceReason || arrivalReason || `Приемка партии ${resolvedBatch.batchNumber}`,
+    })
   }
 
   const handleReserve = () => {
@@ -638,6 +757,59 @@ const WarehousePage = () => {
               </button>
               {warehouseError && <p className="error">Ошибка загрузки складов: {warehouseError.message}</p>}
               {warehouseFetching && <p className="muted">Загружаем список складов...</p>}
+            </div>
+          </div>
+
+          <div className="arrival-card">
+            <h3>Приезд и приемка</h3>
+            <div className="arrival-form">
+              <p className="muted">
+                Статус партии: {resolvedBatch?.status ?? '—'}
+              </p>
+              <label>
+                Комментарий к приезду/приемке
+                <textarea
+                  value={arrivalReason}
+                  onChange={(e) => setArrivalReason(e.target.value)}
+                  placeholder="Например: прибыла от поставщика"
+                />
+              </label>
+              <button
+                onClick={handleArrival}
+                disabled={!resolvedBatch || arrivalMutation.isPending || resolvedStatus === 'ARRIVED' || resolvedStatus === 'ACTIVE'}
+              >
+                {arrivalMutation.isPending ? 'Отмечаем...' : 'Отметить приезд'}
+              </button>
+              <div className="arrival-divider" />
+              <label>
+                Количество к приемке
+                <input
+                  type="number"
+                  value={acceptanceQuantity}
+                  onChange={(e) => setAcceptanceQuantity(Number(e.target.value))}
+                  min="0"
+                  placeholder="Количество"
+                />
+              </label>
+              <label>
+                Комментарий к приемке
+                <textarea
+                  value={acceptanceReason}
+                  onChange={(e) => setAcceptanceReason(e.target.value)}
+                  placeholder="Комментарий к приемке"
+                />
+              </label>
+              <button
+                onClick={handleAcceptance}
+                disabled={
+                  !resolvedBatch ||
+                  acceptanceMutation.isPending ||
+                  acceptanceQuantity <= 0 ||
+                  resolvedStatus !== 'ARRIVED'
+                }
+              >
+                {acceptanceMutation.isPending ? 'Принимаем...' : 'Принять на склад'}
+              </button>
             </div>
           </div>
         </div>

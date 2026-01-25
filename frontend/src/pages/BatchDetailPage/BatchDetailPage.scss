@@ -665,6 +665,11 @@ $accent-info: #17a2b8;
     color: $accent-info; 
     border-color: rgba($accent-info, 0.3);
   }
+  &.arrived { 
+    background: rgba($accent-warning, 0.2); 
+    color: $accent-warning; 
+    border-color: rgba($accent-warning, 0.3);
+  }
   &.quarantine { 
     background: rgba($accent-warning, 0.2); 
     color: $accent-warning; 

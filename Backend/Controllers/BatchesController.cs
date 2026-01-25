@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using System.Data;
 using System.IO;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace Backend.Controllers
@@ -232,6 +233,118 @@ namespace Backend.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating batch status {Id}", id);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPost("{id}/arrival")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<object>> MarkArrival(string id, [FromBody] BatchArrivalRequest? request)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id))
+                    return BadRequest(new { Message = "ID пуст" });
+
+                id = id.Trim();
+
+                var batch = await _context.Batches.FindAsync(id);
+                if (batch == null)
+                    return NotFound(new { Message = "Партия не найдена" });
+
+                var previousStatus = batch.Status;
+                batch.Status = "ARRIVED";
+                batch.UpdatedAt = DateTime.UtcNow;
+
+                var changeLog = new ChangeLog
+                {
+                    BatchId = batch.Id,
+                    UserId = request?.UserId ?? "system",
+                    Action = "BATCH_ARRIVAL",
+                    OldValue = JsonSerializer.Serialize(new { Status = previousStatus }),
+                    NewValue = JsonSerializer.Serialize(new { Status = batch.Status, Reason = request?.Reason }),
+                    Timestamp = DateTime.UtcNow
+                };
+
+                EntityDefaults.ApplyCreationDefaults(changeLog);
+                _context.ChangeLogs.Add(changeLog);
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { batch.Id, batch.Status });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error marking arrival for batch {Id}", id);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPost("{id}/acceptance")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<object>> AcceptBatch(string id, [FromBody] BatchAcceptanceRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id))
+                    return BadRequest(new { Message = "ID пуст" });
+
+                if (request == null || request.Quantity <= 0)
+                    return BadRequest(new { Message = "Количество должно быть больше 0" });
+
+                id = id.Trim();
+
+                var batch = await _context.Batches
+                    .Include(b => b.StockItems)
+                    .FirstOrDefaultAsync(b => b.Id == id);
+
+                if (batch == null)
+                    return NotFound(new { Message = "Партия не найдена" });
+
+                if (!string.Equals(batch.Status, "ARRIVED", StringComparison.OrdinalIgnoreCase))
+                    return BadRequest(new { Message = "Партия не отмечена как прибывшая" });
+
+                var warehouse = await ResolveWarehouseAsync(request.ToWarehouseId);
+                if (warehouse == null)
+                    return BadRequest(new { Message = "Не удалось определить склад" });
+
+                var stockItem = await GetOrCreateStockItemAsync(batch.Id, warehouse.Id);
+                if (batch.StockItems.All(s => s.Id != stockItem.Id))
+                    batch.StockItems.Add(stockItem);
+
+                stockItem.Quantity += request.Quantity;
+                EntityDefaults.ApplyUpdateDefaults(stockItem);
+
+                var movement = new InventoryMovement
+                {
+                    BatchId = batch.Id,
+                    Quantity = request.Quantity,
+                    Reason = string.IsNullOrWhiteSpace(request.Reason)
+                        ? "Приемка партии"
+                        : request.Reason.Trim(),
+                    UserId = request.UserId ?? "system",
+                    Type = MovementType.Receipt,
+                    ToWarehouseId = warehouse.Id
+                };
+
+                EntityDefaults.ApplyCreationDefaults(movement);
+                _context.InventoryMovements.Add(movement);
+
+                batch.Quantity = batch.StockItems.Sum(s => s.Quantity);
+                batch.Status = "ACTIVE";
+                batch.UpdatedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { batch.Id, batch.Status, movement.Id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error accepting batch {Id}", id);
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -561,10 +674,78 @@ namespace Backend.Controllers
             var parts = fileName.Split("__", 2);
             return parts.Length == 2 ? parts[1] : fileName;
         }
+
+        private async Task<Warehouse?> ResolveWarehouseAsync(string? warehouseId)
+        {
+            if (!string.IsNullOrWhiteSpace(warehouseId))
+                return await _context.Warehouses.FindAsync(warehouseId);
+
+            return await GetDefaultWarehouseAsync();
+        }
+
+        private async Task<Warehouse> GetDefaultWarehouseAsync()
+        {
+            var warehouse = await _context.Warehouses.FirstOrDefaultAsync();
+            if (warehouse != null)
+                return warehouse;
+
+            warehouse = new Warehouse
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Основной склад",
+                Type = "MAIN"
+            };
+
+            _context.Warehouses.Add(warehouse);
+            await _context.SaveChangesAsync();
+
+            return warehouse;
+        }
+
+        private async Task<StockItem> GetOrCreateStockItemAsync(string batchId, string warehouseId)
+        {
+            var stockItem = await _context.StockItems
+                .FirstOrDefaultAsync(s => s.BatchId == batchId && s.WarehouseId == warehouseId);
+
+            if (stockItem != null)
+                return stockItem;
+
+            stockItem = new StockItem
+            {
+                Id = Guid.NewGuid().ToString(),
+                BatchId = batchId,
+                WarehouseId = warehouseId,
+                Quantity = 0,
+                Reserved = 0,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _context.StockItems.Add(stockItem);
+            return stockItem;
+        }
     }
 
     public class BatchStatusUpdateRequest
     {
         public string Status { get; set; } = string.Empty;
+    }
+
+    public class BatchAcceptanceRequest
+    {
+        public double Quantity { get; set; }
+
+        public string? ToWarehouseId { get; set; }
+
+        public string? UserId { get; set; }
+
+        public string? Reason { get; set; }
+    }
+
+    public class BatchArrivalRequest
+    {
+        public string? UserId { get; set; }
+
+        public string? Reason { get; set; }
     }
 }

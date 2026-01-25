@@ -7,6 +7,7 @@ import './BatchDetailPage.scss'
 
 const statusLabels: Record<string, string> = {
   DRAFT: 'Черновик',
+  ARRIVED: 'Прибыла',
   QUARANTINE: 'Карантин',
   CERTIFIED: 'Сертифицирована',
   ACTIVE: 'Активна',
@@ -136,7 +137,7 @@ const BatchDetailPage: React.FC = () => {
   if (error) return <div className="error">Ошибка: {(error as any).message}</div>
   if (!batch) return <div>Партия не найдена</div>
 
-  const statusOptions = ['DRAFT', 'QUARANTINE', 'CERTIFIED', 'ACTIVE', 'SHIPPED', 'SCRAPPED']
+  const statusOptions = ['DRAFT', 'ARRIVED', 'QUARANTINE', 'CERTIFIED', 'ACTIVE', 'SHIPPED', 'SCRAPPED']
 
   return (
     <div className="batch-detail-page">

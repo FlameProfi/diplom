@@ -138,6 +138,7 @@ $accent-danger: #dc3545;
   .scanner-container,
   .batch-card,
   .movement-card,
+  .arrival-card,
   .stock-table,
   .reserve-section,
   .notifications-list,
@@ -409,6 +410,30 @@ $accent-danger: #dc3545;
     &.status-pending {
       background: rgba($accent-warning, 0.2);
       color: $accent-warning;
+    }
+
+    &.status-arrived {
+      background: rgba($accent-warning, 0.2);
+      color: $accent-warning;
+    }
+  }
+
+  .arrival-card {
+    h3 {
+      color: $accent-warning;
+      margin-bottom: 1rem;
+    }
+
+    .arrival-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .arrival-divider {
+      height: 1px;
+      background: $border-dark;
+      margin: 0.5rem 0;
     }
   }
 
