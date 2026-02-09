@@ -16,7 +16,7 @@ $accent-danger: #dc3545;
 $accent-info: #17a2b8;
 .batch-detail-page {
   padding: 1rem;
-  max-width: 1200px;
+  // max-width: 1200px;
   margin: 0 auto;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: $bg-dark;
@@ -127,6 +127,34 @@ $accent-info: #17a2b8;
 
         .barcode-wrap {
           margin-top: 0.5rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          max-width: 240px;
+        }
+
+        .barcode-toggle {
+          align-self: flex-start;
+          background: $accent-primary;
+          color: #fff;
+          border: none;
+          padding: 0.4rem 0.9rem;
+          border-radius: 999px;
+          cursor: pointer;
+          font-size: 0.85rem;
+          font-weight: 600;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+          &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba($accent-primary, 0.35);
+          }
+        }
+
+        .barcode-wrap .barcode-canvas {
+          display: block;
+          width: 100%;
+          height: auto;
         }
       }
 

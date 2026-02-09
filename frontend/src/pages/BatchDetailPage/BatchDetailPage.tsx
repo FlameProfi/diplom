@@ -29,6 +29,7 @@ const BatchDetailPage: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [documentType, setDocumentType] = useState('GENERAL')
+  const [showBarcode, setShowBarcode] = useState(false)
 
   // Запрос данных партии
   const { data: batch, isLoading, error, refetch } = useQuery({
@@ -158,7 +159,14 @@ const BatchDetailPage: React.FC = () => {
               <div className="value">{batch.barcode || 'Не указан'}</div>
               {batch.barcode && (
                 <div className="barcode-wrap">
-                  <BarcodeDisplay code={batch.barcode} />
+                  <button
+                    type="button"
+                    className="barcode-toggle"
+                    onClick={() => setShowBarcode((prev) => !prev)}
+                  >
+                    {showBarcode ? 'Скрыть' : 'Показать'}
+                  </button>
+                  {showBarcode && <BarcodeDisplay code={batch.barcode} />}
                 </div>
               )}
             </div>
