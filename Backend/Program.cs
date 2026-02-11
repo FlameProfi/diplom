@@ -1,12 +1,9 @@
 using Backend.Models;
 using Backend.Models.DTO;
 using Backend.Security;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using System.Reflection;
+using Microsoft.OpenApi;
 using System.Text;
 using System.Text.Json.Serialization;
 
