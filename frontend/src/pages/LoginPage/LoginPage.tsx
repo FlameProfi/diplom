@@ -1,8 +1,12 @@
-// src/pages/LoginPage.tsx
-import axios from 'axios'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import api from '../../services/api'
+
+interface LoginResponse {
+  accessToken: string;
+}
+
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,10 +17,11 @@ const LoginPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
     try {
-      const response = await axios.post('http://localhost:3000/auth/login', { email, password });
+      const response = await api.post<LoginResponse>('/auth/login', { email, password });
       login(response.data.accessToken);
-      navigate('/warehouse'); // или на главную страницу после входа
+      navigate('/warehouse');
     } catch (err) {
       setError('Неверный email или пароль');
       console.error(err);

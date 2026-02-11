@@ -1,5 +1,6 @@
 using Backend.Infrastructure;
 using Backend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ namespace Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "ADMIN")]
     [Produces("application/json")]
     public class UsersController : ControllerBase
     {
@@ -44,6 +46,12 @@ namespace Backend.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<User>> Create(User item)
         {
+            item.Role = string.IsNullOrWhiteSpace(item.Role) ? "CLIENT" : item.Role.Trim().ToUpperInvariant();
+            if (!string.IsNullOrWhiteSpace(item.PasswordHash))
+            {
+                item.PasswordHash = BCrypt.Net.BCrypt.HashPassword(item.PasswordHash);
+            }
+
             EntityDefaults.ApplyCreationDefaults(item);
             _context.Users.Add(item);
             await _context.SaveChangesAsync();
@@ -68,7 +76,15 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
+            var incomingPassword = item.PasswordHash;
             _context.Entry(existing).CurrentValues.SetValues(item);
+
+            if (!string.IsNullOrWhiteSpace(incomingPassword))
+            {
+                existing.PasswordHash = BCrypt.Net.BCrypt.HashPassword(incomingPassword);
+            }
+
+            existing.Role = string.IsNullOrWhiteSpace(existing.Role) ? "CLIENT" : existing.Role.Trim().ToUpperInvariant();
             EntityDefaults.ApplyUpdateDefaults(existing);
             await _context.SaveChangesAsync();
 

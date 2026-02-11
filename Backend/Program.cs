@@ -1,10 +1,11 @@
 using Backend.Models;
 using Backend.Models.DTO;
+using Backend.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
-using System.Reflection;
+using Microsoft.OpenApi;
+using System.Text;
 using System.Text.Json.Serialization;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,12 +27,24 @@ builder.Services.AddControllers();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "Metal Factory ERP API", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Введите JWT токен в формате: Bearer {token}"
+    });
+
     //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     //c.IncludeXmlComments(xmlPath);
 });
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());  
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 builder.Services.AddCors(options =>
 {
@@ -54,6 +67,33 @@ builder.Services.AddDbContext<AppDbContext>(options =>
   .MapEnum<OrderStatus>("OrderStatus")
   ));
 
+var jwtKey = builder.Configuration["Jwt:Key"]
+             ?? throw new InvalidOperationException("JWT key is not configured in appsettings.");
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "MetalFactoryERP";
+var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "MetalFactoryERP.Client";
+
+builder.Services
+    .AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = true,
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorizationBuilder()
+    .SetFallbackPolicy(new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build());
+
 builder.Services.AddControllers()
     .AddJsonOptions(o =>
     {
@@ -70,7 +110,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Metal Factory ERP API v1"));
 }
 
-
 app.UseCors("AllowFrontend");
 
 app.UseStaticFiles(new StaticFileOptions
@@ -79,6 +118,7 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/uploads"
 });
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

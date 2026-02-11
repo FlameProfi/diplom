@@ -1,5 +1,6 @@
 ﻿using Backend.Infrastructure;
 using Backend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Backend.Models.DTO;
 using Backend.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,7 @@ namespace Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "ADMIN,MANAGER,LOGIST,ACCOUNTANT")]
     public class OrdersController : ControllerBase
     {
         private readonly AppDbContext _context;
