@@ -77,7 +77,7 @@ var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "MetalFactoryERP.Clie
 
 builder.Services
     .AddAuthentication("Bearer")
-    .AddJwtBearer(options =>
+    .AddScheme<JwtBearerOptions, JwtBearerHandler>("Bearer", options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
