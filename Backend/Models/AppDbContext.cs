@@ -728,6 +728,10 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.PreferredLanguage)
                 .HasDefaultValueSql("'RU'::text")
                 .HasColumnName("preferredLanguage");
+            entity.Property(e => e.Role)
+                .HasDefaultValueSql("'CLIENT'::\"Role\"")
+                .HasColumnType("\"Role\"")
+                .HasColumnName("role");
             entity.Property(e => e.UpdatedAt)
                 .HasColumnType("timestamp(3) with time zone")
                 .HasColumnName("updatedAt");

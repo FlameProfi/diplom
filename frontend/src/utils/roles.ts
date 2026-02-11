@@ -1,11 +1,13 @@
-export enum Role {
-  ADMIN = 'ADMIN',
-  LOGIST = 'LOGIST',
-  WAREHOUSE_WORKER = 'WAREHOUSE_WORKER',
-  MANAGER = 'MANAGER',
-  ACCOUNTANT = 'ACCOUNTANT',
-  CLIENT = 'CLIENT',
-}
+export const Role = {
+  ADMIN: 'ADMIN',
+  LOGIST: 'LOGIST',
+  WAREHOUSE_WORKER: 'WAREHOUSE_WORKER',
+  MANAGER: 'MANAGER',
+  ACCOUNTANT: 'ACCOUNTANT',
+  CLIENT: 'CLIENT',
+} as const;
+
+export type Role = (typeof Role)[keyof typeof Role];
 
 const roleHierarchy = new Map<Role, number>([
   [Role.CLIENT, 0],

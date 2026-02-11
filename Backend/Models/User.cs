@@ -11,6 +11,8 @@ public partial class User
 
     public string Name { get; set; } = null!;
 
+    public string Role { get; set; } = "CLIENT";
+
     public string? PasswordHash { get; set; }
 
     public string PreferredLanguage { get; set; } = null!;

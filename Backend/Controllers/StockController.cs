@@ -1,4 +1,5 @@
 using Backend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Backend.Models.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ namespace Backend.Controllers
 {
     [Route("api/stock")]
     [ApiController]
+    [Authorize(Roles = "ADMIN,WAREHOUSE_WORKER,LOGIST,MANAGER")]
     [Produces("application/json")]
     public class StockController : ControllerBase
     {

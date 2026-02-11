@@ -1,6 +1,15 @@
 // src/context/AuthContext.tsx
 import { jwtDecode } from 'jwt-decode'
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
+
+interface JwtPayload {
+  sub: string;
+  email: string;
+  role?: string;
+  exp?: number;
+  ['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']?: string;
+}
 
 interface User {
   id: string;
@@ -22,14 +31,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('accessToken'));
 
   useEffect(() => {
-    if (token) {
-      try {
-        const decodedToken: { sub: string; email: string; role: string } = jwtDecode(token);
-        setUser({ id: decodedToken.sub, email: decodedToken.email, role: decodedToken.role });
-      } catch (error) {
-        console.error('Invalid token:', error);
+    if (!token) {
+      setUser(null);
+      return;
+    }
+
+    try {
+      const decodedToken = jwtDecode<JwtPayload>(token);
+      const role = decodedToken.role ?? decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+
+      if (!decodedToken.exp || decodedToken.exp * 1000 < Date.now() || !role) {
         logout();
+        return;
       }
+
+      setUser({ id: decodedToken.sub, email: decodedToken.email, role });
+    } catch (error) {
+      console.error('Invalid token:', error);
+      logout();
     }
   }, [token]);
 
