@@ -41,20 +41,6 @@ builder.Services.AddSwaggerGen(c =>
         Description = "Введите JWT токен в формате: Bearer {token}"
     });
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Name = "Authorization",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
-                BearerFormat = "JWT"
-            },
-            Array.Empty<string>()
-        }
-    });
     //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     //c.IncludeXmlComments(xmlPath);
@@ -90,7 +76,7 @@ var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "MetalFactoryERP";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "MetalFactoryERP.Client";
 
 builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddAuthentication("Bearer")
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
