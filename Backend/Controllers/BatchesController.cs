@@ -1,6 +1,7 @@
 ﻿using Backend.Infrastructure;
 using Backend.Models;
 using Backend.Models.DTO;
+using Backend.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -158,8 +159,8 @@ namespace Backend.Controllers
                     Unit = request.Unit?.Trim() ?? string.Empty,
                     Status = request.Status?.Trim() ?? string.Empty,
                     Barcode = request.Barcode?.Trim(),
-                    ProductionDate = request.ProductionDate,
-                    ExpiryDate = request.ExpiryDate,
+                    ProductionDate = request.ProductionDate.HasValue ? EnsureUtc.GoEnsureUtc(request.ProductionDate.Value) : null,
+                    ExpiryDate = request.ExpiryDate.HasValue ? EnsureUtc.GoEnsureUtc(request.ExpiryDate.Value) : null,
                     Parameters = request.Parameters?.Trim(),
                     ExportMarking = request.ExportMarking?.Trim(),
                     PackagingType = request.PackagingType?.Trim(),
