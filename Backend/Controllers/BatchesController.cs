@@ -132,29 +132,41 @@ namespace Backend.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<Batch>> CreateBatch([FromBody] Batch batch)
+        public async Task<ActionResult<BatchDto>> CreateBatch([FromBody] BatchCreateRequestDto request)
         {
             try
             {
-                if (batch == null)
+                if (request == null)
                     return BadRequest(new { Message = "Тело запроса пустое" });
 
-                if (string.IsNullOrWhiteSpace(batch.ProductTypeId))
+                if (string.IsNullOrWhiteSpace(request.ProductTypeId))
                     return BadRequest(new { Message = "Тип продукта обязателен" });
 
-                if (batch.Quantity < 0)
+                if (request.Quantity < 0)
                     return BadRequest(new { Message = "Количество не может быть отрицательным" });
 
-                var productTypeId = batch.ProductTypeId.Trim();
+                var productTypeId = request.ProductTypeId.Trim();
                 var productType = await _context.ProductTypes.FirstOrDefaultAsync(p => p.Id == productTypeId);
                 if (productType == null)
                     return BadRequest(new { Message = "Тип продукта не найден" });
 
+                var batch = new Batch
+                {
+                    ProductTypeId = productTypeId,
+                    Quantity = request.Quantity,
+                    BatchNumber = request.BatchNumber?.Trim() ?? string.Empty,
+                    Unit = request.Unit?.Trim() ?? string.Empty,
+                    Status = request.Status?.Trim() ?? string.Empty,
+                    Barcode = request.Barcode?.Trim(),
+                    ProductionDate = request.ProductionDate,
+                    ExpiryDate = request.ExpiryDate,
+                    Parameters = request.Parameters?.Trim(),
+                    ExportMarking = request.ExportMarking?.Trim(),
+                    PackagingType = request.PackagingType?.Trim(),
+                    MinStock = request.MinStock
+                };
+
                 batch.ProductTypeId = productTypeId;
-                batch.BatchNumber = batch.BatchNumber?.Trim() ?? string.Empty;
-                batch.Unit = batch.Unit?.Trim() ?? string.Empty;
-                batch.Status = batch.Status?.Trim() ?? string.Empty;
-                batch.Barcode = batch.Barcode?.Trim();
 
                 if (string.IsNullOrWhiteSpace(batch.BatchNumber))
                 {
