@@ -537,6 +537,8 @@ namespace Backend.Controllers
                 Unit = productType?.Unit ?? string.Empty,
                 Status = b.Status,
                 Barcode = b.Barcode,
+                ProductionDate = b.ProductionDate,
+                Parameters = b.Parameters,
                 CreatedAt = b.CreatedAt,
                 ProductType = productType == null
                     ? null
