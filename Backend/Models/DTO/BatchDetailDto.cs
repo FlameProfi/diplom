@@ -8,6 +8,8 @@ namespace Backend.Models.DTO
         public string Unit { get; set; } = string.Empty;
         public double Quantity { get; set; }
         public string? Barcode { get; set; }
+        public DateTime? ProductionDate { get; set; }
+        public string? Parameters { get; set; }
         public DateTime CreatedAt { get; set; }
         public ProductTypeSummaryDto? ProductType { get; set; }
         public List<StockItemDetailDto> StockItems { get; set; } = new();

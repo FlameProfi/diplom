@@ -72,6 +72,7 @@ $accent-info: #17a2b8;
   // Секции (карточки)
   .info-section,
   .summary-section,
+  .label-section,
   .movements-section,
   .stock-section,
   .documents-section {
@@ -230,6 +231,57 @@ $accent-info: #17a2b8;
         font-size: 1.2rem;
         color: $text-primary-dark;
         font-weight: 600;
+      }
+    }
+  }
+
+
+
+  .label-section {
+    .label-description {
+      color: $text-secondary-dark;
+      margin-bottom: 1rem;
+    }
+
+    .label-preview {
+      margin-bottom: 1rem;
+    }
+
+    .label-card {
+      background: rgba($bg-dark, 0.7);
+      border: 1px solid $border-dark;
+      border-radius: 8px;
+      padding: 1rem;
+      max-width: 460px;
+    }
+
+    .label-title {
+      margin: 0 0 0.75rem;
+      color: $accent-primary;
+    }
+
+    .label-row {
+      margin-bottom: 0.45rem;
+      color: $text-primary-dark;
+
+      strong {
+        color: $text-secondary-dark;
+        display: inline-block;
+        min-width: 130px;
+      }
+    }
+
+    .print-label-btn {
+      background: $accent-primary;
+      color: #fff;
+      border: none;
+      padding: 0.65rem 1.2rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+
+      &:hover {
+        background: $accent-primary-hover;
       }
     }
   }
@@ -616,6 +668,7 @@ $accent-info: #17a2b8;
 
     .info-section,
     .summary-section,
+    .label-section,
     .movements-section,
     .stock-section,
     .documents-section {

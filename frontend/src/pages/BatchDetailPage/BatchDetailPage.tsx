@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import BarcodeDisplay from '../../components/BarcodeDisplay/BarcodeDisplay'
 import api from '../../services/api'
@@ -22,6 +22,12 @@ const movementLabels: Record<string, string> = {
   RELEASE: 'Снятие резерва',
 }
 
+
+const parameterAliases: Record<string, string[]> = {
+  size: ['size', 'размер', 'габарит', 'dimension'],
+  composition: ['composition', 'состав', 'material', 'материал'],
+}
+
 const BatchDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -30,6 +36,7 @@ const BatchDetailPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null)
   const [documentType, setDocumentType] = useState('GENERAL')
   const [showBarcode, setShowBarcode] = useState(false)
+  const labelPrintRef = useRef<HTMLDivElement | null>(null)
 
   // Запрос данных партии
   const { data: batch, isLoading, error, refetch } = useQuery({
@@ -133,6 +140,81 @@ const BatchDetailPage: React.FC = () => {
     return `${(normalized / 1024).toFixed(1)} KB`
   }
 
+  const parsedParameters = useMemo(() => {
+    const raw = String(batch?.parameters ?? '').trim()
+    if (!raw) return {}
+
+    try {
+      const parsed = JSON.parse(raw)
+      if (parsed && typeof parsed === 'object') {
+        return parsed as Record<string, unknown>
+      }
+    } catch {
+      // ignore parse errors and fallback to plain text
+    }
+
+    return { raw }
+  }, [batch?.parameters])
+
+  const getParameterValue = (aliases: string[]) => {
+    const entries = Object.entries(parsedParameters)
+    const found = entries.find(([key]) => aliases.includes(key.toLowerCase()))
+    if (!found) return null
+
+    const value = found[1]
+    if (value == null) return null
+    return String(value)
+  }
+
+  const labelData = useMemo(() => {
+    const size = getParameterValue(parameterAliases.size) || 'Не указан'
+    const composition = getParameterValue(parameterAliases.composition)
+      || (batch?.parameters ? String(batch.parameters) : 'Не указан')
+
+    return {
+      size,
+      composition,
+      batchNumber: batch?.batchNumber || '—',
+      productionDate: formatDateTime(batch?.productionDate || batch?.createdAt),
+    }
+  }, [batch, parsedParameters])
+
+  const handlePrintLabel = () => {
+    if (!labelPrintRef.current) return
+
+    const printWindow = window.open('', '_blank', 'width=900,height=700')
+    if (!printWindow) {
+      alert('Не удалось открыть окно печати. Разрешите всплывающие окна.')
+      return
+    }
+
+    const printableStyles = `
+      <style>
+        body { font-family: Arial, sans-serif; margin: 24px; }
+        .label-card { border: 2px solid #111827; border-radius: 10px; padding: 20px; max-width: 520px; }
+        .label-title { margin: 0 0 16px; font-size: 22px; }
+        .label-row { margin-bottom: 8px; font-size: 16px; }
+        .label-row strong { display: inline-block; min-width: 150px; }
+      </style>
+    `
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Этикетка партии ${labelData.batchNumber}</title>
+          ${printableStyles}
+        </head>
+        <body>
+          ${labelPrintRef.current.outerHTML}
+        </body>
+      </html>
+    `)
+    printWindow.document.close()
+    printWindow.focus()
+    printWindow.print()
+    printWindow.close()
+  }
+
   if (isLoading) return <div className="loading">Загрузка...</div>
   if (error) return <div className="error">Ошибка: {(error as any).message}</div>
   if (!batch) return <div>Партия не найдена</div>
@@ -224,6 +306,26 @@ const BatchDetailPage: React.FC = () => {
               <div className="value">{summary.totalAvailable} {batch.unit}</div>
             </div>
           </div>
+        </section>
+
+
+        <section className="label-section">
+          <h2>Этикетка продукции</h2>
+          <p className="label-description">
+            Генерация и печать этикеток с параметрами продукции.
+          </p>
+          <div className="label-preview" ref={labelPrintRef}>
+            <div className="label-card">
+              <h3 className="label-title">Этикетка партии</h3>
+              <div className="label-row"><strong>Размер:</strong> {labelData.size}</div>
+              <div className="label-row"><strong>Состав:</strong> {labelData.composition}</div>
+              <div className="label-row"><strong>Партия:</strong> {labelData.batchNumber}</div>
+              <div className="label-row"><strong>Дата выпуска:</strong> {labelData.productionDate}</div>
+            </div>
+          </div>
+          <button type="button" className="print-label-btn" onClick={handlePrintLabel}>
+            Печать этикетки
+          </button>
         </section>
 
         <section className="movements-section">
