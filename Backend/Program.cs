@@ -77,9 +77,9 @@ var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "MetalFactoryERP.Clie
 
 builder.Services
     .AddAuthentication("Bearer")
-    .AddScheme<JwtBearerOptions, JwtBearerHandler>("Bearer", options =>
+    .AddJwtBearer("Bearer", options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
@@ -87,7 +87,7 @@ builder.Services
             ValidateLifetime = true,
             ValidIssuer = jwtIssuer,
             ValidAudience = jwtAudience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
             ClockSkew = TimeSpan.Zero
         };
     });
