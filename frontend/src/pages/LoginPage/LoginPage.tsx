@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import api from '../../services/api'
+import logo from '../../assets/logo.png'
 import './LoginPage.css'
 
 interface LoginResponse {
@@ -37,8 +38,9 @@ const LoginPage = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1 className="login-title">Вход в систему</h1>
-          <p className="login-subtitle">Metal Factory ERP</p>
+          <img src={logo} alt="Metal Factory Logo" className="login-logo" />
+          <h1 className="login-title">Добро пожаловать</h1>
+          <p className="login-subtitle">Войдите в систему Metal Factory ERP</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
