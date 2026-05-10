@@ -24,28 +24,24 @@ namespace Backend.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<StockDto>>> GetStock()
         {
-            var items = await _context.StockItems
-                .Include(s => s.Batch)
-                .Include(s => s.Warehouse)
-                .ToListAsync();
-
-            var dtos = items.Select(s => new StockDto
-            {
-                Id = s.Id,
-                Quantity = s.Quantity,
-                Reserved = s.Reserved,
-                Batch = new StockBatchDto
+            var dtos = await _context.StockItems
+                .Select(s => new StockDto
                 {
-                    Id = s.Batch.Id,
-                    BatchNumber = s.Batch.BatchNumber,
-                    Unit = s.Batch.Unit
-                },
-                Warehouse = new StockWarehouseDto
-                {
-                    Id = s.Warehouse.Id,
-                    Name = s.Warehouse.Name
-                }
-            }).ToList();
+                    Id = s.Id,
+                    Quantity = s.Quantity,
+                    Reserved = s.Reserved,
+                    Batch = new StockBatchDto
+                    {
+                        Id = s.Batch.Id,
+                        BatchNumber = s.Batch.BatchNumber,
+                        Unit = s.Batch.Unit
+                    },
+                    Warehouse = new StockWarehouseDto
+                    {
+                        Id = s.Warehouse.Id,
+                        Name = s.Warehouse.Name
+                    }
+                }).ToListAsync();
 
             return Ok(dtos);
         }
@@ -55,29 +51,25 @@ namespace Backend.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<StockDto>>> GetStockByBatch(string batchId)
         {
-            var items = await _context.StockItems
-                .Include(s => s.Batch)
-                .Include(s => s.Warehouse)
+            var dtos = await _context.StockItems
                 .Where(s => s.BatchId == batchId)
-                .ToListAsync();
-
-            var dtos = items.Select(s => new StockDto
-            {
-                Id = s.Id,
-                Quantity = s.Quantity,
-                Reserved = s.Reserved,
-                Batch = new StockBatchDto
+                .Select(s => new StockDto
                 {
-                    Id = s.Batch.Id,
-                    BatchNumber = s.Batch.BatchNumber,
-                    Unit = s.Batch.Unit
-                },
-                Warehouse = new StockWarehouseDto
-                {
-                    Id = s.Warehouse.Id,
-                    Name = s.Warehouse.Name
-                }
-            }).ToList();
+                    Id = s.Id,
+                    Quantity = s.Quantity,
+                    Reserved = s.Reserved,
+                    Batch = new StockBatchDto
+                    {
+                        Id = s.Batch.Id,
+                        BatchNumber = s.Batch.BatchNumber,
+                        Unit = s.Batch.Unit
+                    },
+                    Warehouse = new StockWarehouseDto
+                    {
+                        Id = s.Warehouse.Id,
+                        Name = s.Warehouse.Name
+                    }
+                }).ToListAsync();
 
             return Ok(dtos);
         }
