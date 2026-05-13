@@ -4,11 +4,13 @@ using Backend.Models.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "ADMIN,MANAGER,ACCOUNTANT,LOGIST")]
     public class CustomersController : ControllerBase
     {
         private readonly AppDbContext _context;

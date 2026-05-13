@@ -4,17 +4,17 @@ import { useAuth } from '../context/AuthContext'
 import { hasPermission, Role } from '../utils/roles'
 
 interface ProtectedRouteProps {
-  requiredRole: Role;
+  allowedRoles?: Role[];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
   const { user } = useAuth();
 
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!hasPermission(user.role as Role, requiredRole)) {
+  if (allowedRoles && !hasPermission(user.role, allowedRoles)) {
     return <Navigate to="/forbidden" replace />;
   }
 
