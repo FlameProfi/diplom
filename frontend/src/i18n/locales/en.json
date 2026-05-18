@@ -1,0 +1,457 @@
+{
+  "login": {
+    "title": "Welcome",
+    "subtitle": "Sign in to Metal Factory ERP",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter password",
+    "submit": "Sign In",
+    "loading": "Signing In...",
+    "error": "Invalid email or password"
+  },
+  "layout": {
+    "brandSubtitle": "Warehouse & Production",
+    "nav": {
+      "dashboard": "Overview",
+      "warehouse": "Warehouse",
+      "batches": "Batches",
+      "orders": "Orders",
+      "customers": "Customers"
+    },
+    "footerLabel": "System Version",
+    "topbarTitle": "Dashboard",
+    "topbarSubtitle": "Production and warehouse data",
+    "actions": {
+      "export": "Export",
+      "create": "Create Request"
+    }
+  },
+  "batches": {
+    "title": "Product Batches",
+    "subtitle": "Create new batches and track their status",
+    "stats": {
+      "total": "Total: {{count}}",
+      "active": "Active: {{count}}"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "new": "New Batch",
+      "save": "Save...",
+      "create": "Create Batch",
+      "reset": "Reset",
+      "details": "Details"
+    },
+    "form": {
+      "batchNumber": "Batch Number",
+      "batchNumberPlaceholder": "BATCH-2024-001",
+      "batchNumberHelper": "Leave empty for auto-generation",
+      "productType": "Product Type",
+      "productTypePlaceholder": "Select type",
+      "quantity": "Quantity",
+      "unit": "Unit",
+      "unitPlaceholder": "kg, l, pcs",
+      "status": "Status",
+      "productionDate": "Production Date",
+      "expiryDate": "Expiry Date",
+      "barcode": "Barcode",
+      "barcodePlaceholder": "Will be generated automatically",
+      "packagingType": "Packaging Type",
+      "packagingTypePlaceholder": "Drum, box, pallet",
+      "minStock": "Min Stock"
+    },
+    "filters": {
+      "searchPlaceholder": "Search by number or barcode...",
+      "allStatuses": "All statuses",
+      "active": "Active",
+      "shipped": "Shipped",
+      "scrapped": "Scrapped"
+    },
+    "table": {
+      "number": "Number",
+      "type": "Type",
+      "quantity": "Qty",
+      "barcode": "Barcode",
+      "status": "Status",
+      "actions": "Actions",
+      "empty": "No batches found"
+    },
+    "statuses": {
+      "DRAFT": "Draft",
+      "QUARANTINE": "Quarantine",
+      "CERTIFIED": "Certified",
+      "ACTIVE": "Active",
+      "SHIPPED": "Shipped",
+      "SCRAPPED": "Scrapped"
+    },
+    "loading": "Loading batches...",
+    "errorLoading": "Error loading data",
+    "createError": "Error creating batch: {{message}}"
+  },
+  "warehouse": {
+    "title": "Warehouse Dashboard",
+    "accessDenied": "Access Restricted",
+    "authRequired": "You must log in to work with the warehouse",
+    "login": "Sign In",
+    "resetBatch": "Reset Batch",
+    "logout": "Logout",
+    "tabs": {
+      "scan": "Scanner",
+      "stock": "Stock",
+      "reserve": "Reserve",
+      "notifications": "Notifications",
+      "overview": "Overview",
+      "movements": "Movements"
+    },
+    "scan": {
+      "manualInput": "Barcode manually",
+      "find": "Find",
+      "searching": "Searching for batch...",
+      "searchError": "Error searching for batch: {{message}}",
+      "batchTitle": "Batch",
+      "number": "Number",
+      "type": "Type",
+      "quantity": "Stock",
+      "reserve": "Reserve",
+      "available": "Available",
+      "status": "Status",
+      "scanPrompt": "Scan a batch to see details.",
+      "operationTitle": "Operation",
+      "opType": "Operation Type",
+      "warehouse": "Warehouse",
+      "defaultWarehouse": "Default",
+      "quantityLabel": "Quantity",
+      "quantityPlaceholder": "Quantity",
+      "reason": "Reason",
+      "reasonPlaceholder": "Comment for operation",
+      "submit": "Execute",
+      "saving": "Saving...",
+      "loadWarehousesError": "Error loading warehouses: {{message}}",
+      "loadingWarehouses": "Loading warehouses list...",
+      "receipt": "Receipt",
+      "issue": "Issue",
+      "reserveOp": "Reserve",
+      "movementSuccess": "Movement successfully created!",
+      "sessionExpired": "Session expired. Please log in again.",
+      "forbidden": "Insufficient permissions to perform the operation.",
+      "createError": "Error creating movement: {{message}}",
+      "scanRequired": "Scan or find a batch first",
+      "quantityRequired": "Enter quantity greater than 0",
+      "insufficientStock": "Insufficient stock available. Available: {{count}}",
+      "authPrompt": "Please log in to work with the system"
+    },
+    "stock": {
+      "searchPlaceholder": "Search by batch or warehouse",
+      "allWarehouses": "All warehouses",
+      "loading": "Loading stock...",
+      "error": "Error loading stock: {{message}}",
+      "table": {
+        "batch": "Batch",
+        "warehouse": "Warehouse",
+        "quantity": "Stock",
+        "reserve": "Reserve",
+        "available": "Available"
+      },
+      "empty": "No stock found. Run seed or add data."
+    },
+    "reserve": {
+      "title": "Reserve for Orders",
+      "loadingOrders": "Loading orders...",
+      "errorOrders": "Error loading orders: {{message}}",
+      "batchPrompt": "Batch for reserve: {{number}} (available: {{count}} {{unit}})",
+      "orderItem": "Order Item",
+      "selectOrderItem": "Select order item",
+      "noOrdersForBatch": "No orders for this batch. Check order list or select another batch.",
+      "quantityForReserve": "Quantity for reserve",
+      "reserveBtn": "Reserve",
+      "reserving": "Reserving...",
+      "scanFirst": "Scan a batch for reserve first.",
+      "manualPrompt": "Or select an order and pull the batch manually:",
+      "selectOrder": "Select order",
+      "reserveSuccess": "Reserve successfully created!",
+      "forbidden": "Insufficient permissions to create reserve.",
+      "error": "Reserve error: {{message}}"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "loading": "Loading notifications...",
+      "error": "Error loading notifications: {{message}}",
+      "empty": "No notifications. Create movement to generate (low stock)."
+    },
+    "overview": {
+      "summary": "Warehouse Summary",
+      "total": "Total",
+      "reserve": "In Reserve",
+      "available": "Available",
+      "loading": "Loading summary...",
+      "activeBatch": "Active Batch",
+      "notSelected": "Batch not selected.",
+      "currentWarehouse": "Current Warehouse",
+      "default": "Default",
+      "errorWarehouses": "Error loading warehouses: {{message}}"
+    },
+    "movements": {
+      "searchPlaceholder": "Search by batch, warehouse or user",
+      "refresh": "Refresh",
+      "loading": "Loading movements...",
+      "error": "Error loading movements: {{message}}",
+      "table": {
+        "date": "Date",
+        "batch": "Batch",
+        "type": "Type",
+        "quantity": "Quantity",
+        "warehouse": "Warehouse",
+        "user": "User",
+        "comment": "Comment"
+      },
+      "empty": "No movements yet."
+    },
+    "processing": "Processing..."
+  },
+  "orders": {
+    "title": "Orders",
+    "subtitle": "Order control, statuses and batch compositions",
+    "actions": {
+      "cancel": "Cancel",
+      "new": "New Order",
+      "create": "Create Order",
+      "creating": "Creating...",
+      "resetFilter": "Reset Customer Filter",
+      "delete": "Delete",
+      "addPosition": "+ Add Position"
+    },
+    "summary": {
+      "total": "Total Orders",
+      "new": "New",
+      "inProduction": "In Production",
+      "totalAmount": "Total Amount"
+    },
+    "form": {
+      "orderNumber": "Order Number",
+      "orderNumberPlaceholder": "ORDER-XXX",
+      "customer": "Customer",
+      "selectCustomer": "Select customer",
+      "status": "Status",
+      "expectedDelivery": "Expected Delivery",
+      "deliveryError": "Date must be in the future",
+      "productionNotes": "Production Notes",
+      "packingNotes": "Packing Notes",
+      "itemsTitle": "Order Items",
+      "total": "Total: {{amount}} ₽",
+      "selectBatch": "Select batch",
+      "quantity": "Qty",
+      "price": "Price per unit"
+    },
+    "filters": {
+      "searchPlaceholder": "Search by number or customer...",
+      "allStatuses": "All statuses"
+    },
+    "table": {
+      "number": "Number",
+      "customer": "Customer",
+      "status": "Status",
+      "items": "Items",
+      "amount": "Amount",
+      "created": "Created",
+      "delivery": "Delivery",
+      "actions": "Actions",
+      "empty": "No orders found"
+    },
+    "statuses": {
+      "NEW": "New",
+      "IN_PRODUCTION": "In Production",
+      "PACKED": "Packed",
+      "READY_FOR_SHIPMENT": "Ready for Shipment",
+      "SHIPPED": "Shipped",
+      "DELIVERED": "Delivered",
+      "CANCELLED": "Cancelled"
+    },
+    "errors": {
+      "deliveryDate": "Delivery date must not be earlier than today",
+      "noItems": "Add at least one position with a batch",
+      "create": "Creation error: {{message}}",
+      "update": "Update error: {{message}}",
+      "loading": "Error loading data"
+    },
+    "loading": "Loading..."
+  },
+  "batchDetail": {
+    "title": "Detail: {{number}}",
+    "back": "Back",
+    "loading": "Loading...",
+    "error": "Error: {{message}}",
+    "notFound": "Batch not found",
+    "sections": {
+      "main": "Main Information",
+      "summary": "Quantity Summary",
+      "label": "Product Label",
+      "movements": "Movements",
+      "stock": "Stock by Warehouse",
+      "documents": "Documents"
+    },
+    "fields": {
+      "number": "Batch Number",
+      "barcode": "Barcode",
+      "notSpecified": "Not specified",
+      "show": "Show",
+      "hide": "Hide",
+      "productType": "Product Type",
+      "unit": "Unit",
+      "created": "Created",
+      "status": "Status",
+      "updating": "Updating...",
+      "total": "Total",
+      "reserved": "Reserved",
+      "available": "Available"
+    },
+    "label": {
+      "description": "Generate and print labels with product parameters.",
+      "title": "Batch Label",
+      "size": "Size",
+      "composition": "Composition",
+      "productionDate": "Production Date",
+      "print": "Print Label",
+      "printWindowError": "Failed to open print window. Please allow popups.",
+      "printWindowTitle": "Batch Label {{number}}"
+    },
+    "movements": {
+      "empty": "No movements",
+      "types": {
+        "IN": "Receipt",
+        "OUT": "Issue",
+        "MOVE": "Movement",
+        "RESERVE": "Reserve",
+        "RELEASE": "Release"
+      }
+    },
+    "stock": {
+      "warehouse": "Warehouse",
+      "type": "Type",
+      "location": "Location",
+      "quantity": "Quantity",
+      "reserved": "Reserved",
+      "available": "Available",
+      "unknownWarehouse": "Unknown warehouse",
+      "empty": "No stock"
+    },
+    "documents": {
+      "type": "Document Type",
+      "types": {
+        "GENERAL": "General",
+        "CERTIFICATE": "Certificate",
+        "INVOICE": "Invoice",
+        "SPEC": "Specification"
+      },
+      "upload": "Upload Document",
+      "uploading": "Uploading...",
+      "selected": "Selected: {{name}} ({{size}})",
+      "delete": "Delete",
+      "empty": "No documents",
+      "deleteConfirm": "Delete document?",
+      "deleteError": "Error deleting file",
+      "uploadError": "Error uploading file",
+      "statusUpdateError": "Error updating status"
+    }
+  },
+  "customers": {
+    "title": "Customers",
+    "stats": {
+      "total": "Total: {{count}}",
+      "regions": "Regions: {{count}}"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "new": "New Customer",
+      "create": "Create Customer",
+      "creating": "Creating..."
+    },
+    "form": {
+      "name": "Customer Name",
+      "namePlaceholder": "Metal Factory LLC",
+      "phone": "Phone",
+      "region": "Region",
+      "regionPlaceholder": "Moscow Region",
+      "country": "Country",
+      "countryPlaceholder": "Russia",
+      "address": "Address",
+      "addressPlaceholder": "Delivery or office address",
+      "taxId": "Tax ID",
+      "taxIdPlaceholder": "INN/KPP"
+    },
+    "filters": {
+      "searchPlaceholder": "Search by name, email or phone...",
+      "regionPlaceholder": "Filter by region (server)"
+    },
+    "table": {
+      "name": "Name",
+      "phone": "Phone",
+      "region": "Region",
+      "country": "Country",
+      "address": "Address",
+      "taxId": "Tax ID",
+      "created": "Created",
+      "orders": "Orders",
+      "ordersCount": "{{count}} orders",
+      "empty": "No customers found"
+    },
+    "errors": {
+      "create": "Creation error: {{message}}",
+      "loading": "Error loading customers"
+    },
+    "loading": "Loading customers..."
+  },
+  "dashboard": {
+    "loading": "Loading data...",
+    "error": "Error loading data",
+    "metrics": {
+      "totalBatches": "Total Batches",
+      "activeBatches": "Active: {{count}}",
+      "warehouseStock": "Warehouse Stock",
+      "inReserve": "In Reserve: {{count}}",
+      "orders": "Orders",
+      "newOrders": "New: {{count}}",
+      "customers": "Customers",
+      "activeContracts": "Active Contracts: {{count}}",
+      "contracts": "Contracts",
+      "inProgress": "In Progress: {{count}}"
+    },
+    "recentBatches": {
+      "title": "Recent Batches",
+      "updatedToday": "Updated today",
+      "noType": "No type",
+      "empty": "No batches found"
+    },
+    "activeOrders": {
+      "title": "Active Orders",
+      "currentMonth": "Current month",
+      "noCustomer": "No customer",
+      "empty": "No orders found"
+    },
+    "newCustomers": {
+      "title": "New Customers",
+      "recentRegistrations": "Recent registrations",
+      "noRegion": "Region not specified",
+      "empty": "No customers found"
+    },
+    "movements": {
+      "title": "Warehouse Movements",
+      "recentOperations": "Recent operations",
+      "empty": "No operations found",
+      "types": {
+        "RECEIPT": "Receipt",
+        "ISSUE": "Issue",
+        "RESERVE": "Reserve"
+      }
+    }
+  },
+  "forbidden": {
+    "title": "403 - Access Denied",
+    "message": "You do not have permissions to view this page.",
+    "backHome": "Back to Home"
+  },
+  "scanner": {
+    "scanComplete": "Scanning complete!",
+    "scanAgain": "Scan again",
+    "scanError": "Scanning error: {{message}}"
+  }
+}

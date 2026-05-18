@@ -1,26 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import React, { useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import BarcodeDisplay from '../../components/BarcodeDisplay/BarcodeDisplay'
 import api from '../../services/api'
 import './BatchDetailPage.scss'
-
-const statusLabels: Record<string, string> = {
-  DRAFT: 'Черновик',
-  QUARANTINE: 'Карантин',
-  CERTIFIED: 'Сертифицирована',
-  ACTIVE: 'Активна',
-  SHIPPED: 'Отгружена',
-  SCRAPPED: 'Списана',
-}
-
-const movementLabels: Record<string, string> = {
-  IN: 'Поступление',
-  OUT: 'Списание',
-  MOVE: 'Перемещение',
-  RESERVE: 'Резерв',
-  RELEASE: 'Снятие резерва',
-}
 
 
 const parameterAliases: Record<string, string[]> = {
@@ -32,6 +16,24 @@ const BatchDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { t, i18n } = useTranslation()
+
+  const statusLabels: Record<string, string> = {
+    DRAFT: t('batchDetail.fields.status_DRAFT', { defaultValue: t('batches.statuses.DRAFT') }),
+    QUARANTINE: t('batchDetail.fields.status_QUARANTINE', { defaultValue: t('batches.statuses.QUARANTINE') }),
+    CERTIFIED: t('batchDetail.fields.status_CERTIFIED', { defaultValue: t('batches.statuses.CERTIFIED') }),
+    ACTIVE: t('batchDetail.fields.status_ACTIVE', { defaultValue: t('batches.statuses.ACTIVE') }),
+    SHIPPED: t('batchDetail.fields.status_SHIPPED', { defaultValue: t('batches.statuses.SHIPPED') }),
+    SCRAPPED: t('batchDetail.fields.status_SCRAPPED', { defaultValue: t('batches.statuses.SCRAPPED') }),
+  }
+
+  const movementLabels: Record<string, string> = {
+    IN: t('batchDetail.movements.types.IN'),
+    OUT: t('batchDetail.movements.types.OUT'),
+    MOVE: t('batchDetail.movements.types.MOVE'),
+    RESERVE: t('batchDetail.movements.types.RESERVE'),
+    RELEASE: t('batchDetail.movements.types.RELEASE'),
+  }
   const [selectedStatus, setSelectedStatus] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [documentType, setDocumentType] = useState('GENERAL')
@@ -58,7 +60,7 @@ const BatchDetailPage: React.FC = () => {
       refetch()
       queryClient.invalidateQueries({ queryKey: ['batches'] })
     },
-    onError: (error: any) => alert(error.response?.data?.message || 'Ошибка обновления статуса'),
+    onError: (error: any) => alert(t('batchDetail.documents.statusUpdateError', { message: error.response?.data?.message || error.message })),
   })
 
   // Мутирование загрузки документа
@@ -73,7 +75,7 @@ const BatchDetailPage: React.FC = () => {
       refetch()
       setFile(null)
     },
-    onError: (error: any) => alert(error.response?.data?.message || 'Ошибка загрузки файла'),
+    onError: (error: any) => alert(t('batchDetail.documents.uploadError', { message: error.response?.data?.message || error.message })),
   })
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -99,12 +101,12 @@ const BatchDetailPage: React.FC = () => {
   }
 
   const handleDeleteDocument = async (documentId: string) => {
-    if (!confirm('Удалить документ?')) return
+    if (!confirm(t('batchDetail.documents.deleteConfirm'))) return
     try {
       await api.delete(`/batches/documents/${documentId}`)
       refetch()
     } catch (error) {
-      alert('Ошибка удаления файла')
+      alert(t('batchDetail.documents.deleteError'))
     }
   }
 
@@ -119,7 +121,7 @@ const BatchDetailPage: React.FC = () => {
   const formatDateTime = (value?: string | Date) => {
     if (!value) return '—'
     const date = typeof value === 'string' ? new Date(value) : value
-    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString('ru-RU')
+    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString(i18n.language === 'ru' ? 'ru-RU' : 'en-US')
   }
 
   const baseUrl = useMemo(() => {
@@ -167,9 +169,9 @@ const BatchDetailPage: React.FC = () => {
   }
 
   const labelData = useMemo(() => {
-    const size = getParameterValue(parameterAliases.size) || 'Не указан'
+    const size = getParameterValue(parameterAliases.size) || t('batchDetail.fields.notSpecified')
     const composition = getParameterValue(parameterAliases.composition)
-      || (batch?.parameters ? String(batch.parameters) : 'Не указан')
+      || (batch?.parameters ? String(batch.parameters) : t('batchDetail.fields.notSpecified'))
 
     return {
       size,
@@ -177,7 +179,7 @@ const BatchDetailPage: React.FC = () => {
       batchNumber: batch?.batchNumber || '—',
       productionDate: formatDateTime(batch?.productionDate || batch?.createdAt),
     }
-  }, [batch, parsedParameters])
+  }, [batch, parsedParameters, t])
 
   const handlePrintLabel = () => {
     if (!labelPrintRef.current) return
@@ -201,7 +203,7 @@ const BatchDetailPage: React.FC = () => {
     printWindow.document.write(`
       <html>
         <head>
-          <title>Этикетка партии ${labelData.batchNumber}</title>
+          <title>${t('batchDetail.label.printWindowTitle', { number: labelData.batchNumber })}</title>
           ${printableStyles}
         </head>
         <body>
@@ -215,30 +217,30 @@ const BatchDetailPage: React.FC = () => {
     printWindow.close()
   }
 
-  if (isLoading) return <div className="loading">Загрузка...</div>
-  if (error) return <div className="error">Ошибка: {(error as any).message}</div>
-  if (!batch) return <div>Партия не найдена</div>
+  if (isLoading) return <div className="loading">{t('batchDetail.loading')}</div>
+  if (error) return <div className="error">{t('batchDetail.error', { message: (error as any).message })}</div>
+  if (!batch) return <div>{t('batchDetail.notFound')}</div>
 
   const statusOptions = ['DRAFT', 'QUARANTINE', 'CERTIFIED', 'ACTIVE', 'SHIPPED', 'SCRAPPED']
 
   return (
     <div className="batch-detail-page">
       <header className="page-header">
-        <h1>Подробно: {batch.batchNumber}</h1>
-        <button onClick={() => navigate('/batches')} className="back-btn">Назад</button>
+        <h1>{t('batchDetail.title', { number: batch.batchNumber })}</h1>
+        <button onClick={() => navigate('/batches')} className="back-btn">{t('batchDetail.back')}</button>
       </header>
 
       <div className="batch-info">
         <section className="info-section">
-          <h2>Основная информация</h2>
+          <h2>{t('batchDetail.sections.main')}</h2>
           <div className="info-grid">
             <div className="info-item">
-              <label>Номер партии</label>
+              <label>{t('batchDetail.fields.number')}</label>
               <div className="value">{batch.batchNumber}</div>
             </div>
             <div className="info-item">
-              <label>Штрих-код</label>
-              <div className="value">{batch.barcode || 'Не указан'}</div>
+              <label>{t('batchDetail.fields.barcode')}</label>
+              <div className="value">{batch.barcode || t('batchDetail.fields.notSpecified')}</div>
               {batch.barcode && (
                 <div className="barcode-wrap">
                   <button
@@ -246,26 +248,26 @@ const BatchDetailPage: React.FC = () => {
                     className="barcode-toggle"
                     onClick={() => setShowBarcode((prev) => !prev)}
                   >
-                    {showBarcode ? 'Скрыть' : 'Показать'}
+                    {showBarcode ? t('batchDetail.fields.hide') : t('batchDetail.fields.show')}
                   </button>
                   {showBarcode && <BarcodeDisplay code={batch.barcode} />}
                 </div>
               )}
             </div>
             <div className="info-item">
-              <label>Тип продукта</label>
-              <div className="value">{batch.productType?.name || batch.productTypeName || 'Не указан'}</div>
+              <label>{t('batchDetail.fields.productType')}</label>
+              <div className="value">{batch.productType?.name || batch.productTypeName || t('batchDetail.fields.notSpecified')}</div>
             </div>
             <div className="info-item">
-              <label>Единица измерения</label>
+              <label>{t('batchDetail.fields.unit')}</label>
               <div className="value">{batch.unit || '—'}</div>
             </div>
             <div className="info-item">
-              <label>Создана</label>
+              <label>{t('batchDetail.fields.created')}</label>
               <div className="value">{formatDateTime(batch.createdAt)}</div>
             </div>
             <div className="info-item status-item">
-              <label>Статус</label>
+              <label>{t('batchDetail.fields.status')}</label>
               <div className="value">
                 <span className={`status-badge ${normalizeStatusClass(batch.status)}`}>
                   {statusLabels[batch.status] || batch.status || '—'}
@@ -283,7 +285,7 @@ const BatchDetailPage: React.FC = () => {
                   ))}
                 </select>
                 {updateStatusMutation.isPending && (
-                  <span className="status-updating">Обновление...</span>
+                  <span className="status-updating">{t('batchDetail.fields.updating')}</span>
                 )}
               </div>
             </div>
@@ -291,18 +293,18 @@ const BatchDetailPage: React.FC = () => {
         </section>
 
         <section className="summary-section">
-          <h2>Сводка по количеству</h2>
+          <h2>{t('batchDetail.sections.summary')}</h2>
           <div className="summary-grid">
             <div className="summary-item">
-              <label>Всего</label>
+              <label>{t('batchDetail.fields.total')}</label>
               <div className="value">{summary.totalQuantity} {batch.unit}</div>
             </div>
             <div className="summary-item">
-              <label>Зарезервировано</label>
+              <label>{t('batchDetail.fields.reserved')}</label>
               <div className="value">{summary.totalReserved} {batch.unit}</div>
             </div>
             <div className="summary-item">
-              <label>Доступно</label>
+              <label>{t('batchDetail.fields.available')}</label>
               <div className="value">{summary.totalAvailable} {batch.unit}</div>
             </div>
           </div>
@@ -310,26 +312,26 @@ const BatchDetailPage: React.FC = () => {
 
 
         <section className="label-section">
-          <h2>Этикетка продукции</h2>
+          <h2>{t('batchDetail.sections.label')}</h2>
           <p className="label-description">
-            Генерация и печать этикеток с параметрами продукции.
+            {t('batchDetail.label.description')}
           </p>
           <div className="label-preview" ref={labelPrintRef}>
             <div className="label-card">
-              <h3 className="label-title">Этикетка партии</h3>
-              <div className="label-row"><strong>Размер:</strong> {labelData.size}</div>
-              <div className="label-row"><strong>Состав:</strong> {labelData.composition}</div>
-              <div className="label-row"><strong>Партия:</strong> {labelData.batchNumber}</div>
-              <div className="label-row"><strong>Дата выпуска:</strong> {labelData.productionDate}</div>
+              <h3 className="label-title">{t('batchDetail.label.title')}</h3>
+              <div className="label-row"><strong>{t('batchDetail.label.size')}:</strong> {labelData.size}</div>
+              <div className="label-row"><strong>{t('batchDetail.label.composition')}:</strong> {labelData.composition}</div>
+              <div className="label-row"><strong>{t('batchDetail.fields.number')}:</strong> {labelData.batchNumber}</div>
+              <div className="label-row"><strong>{t('batchDetail.label.productionDate')}:</strong> {labelData.productionDate}</div>
             </div>
           </div>
           <button type="button" className="print-label-btn" onClick={handlePrintLabel}>
-            Печать этикетки
+            {t('batchDetail.label.print')}
           </button>
         </section>
 
         <section className="movements-section">
-          <h2>Движения</h2>
+          <h2>{t('batchDetail.sections.movements')}</h2>
           {batch.inventoryMovements?.length ? (
             <ul className="movements-list">
               {batch.inventoryMovements.map((movement: any) => (
@@ -345,23 +347,23 @@ const BatchDetailPage: React.FC = () => {
               ))}
             </ul>
           ) : (
-            <p className="no-movements">Нет движений</p>
+            <p className="no-movements">{t('batchDetail.movements.empty')}</p>
           )}
         </section>
 
         <section className="stock-section">
-          <h2>Запасы по складам</h2>
+          <h2>{t('batchDetail.sections.stock')}</h2>
           {batch.stockItems?.length ? (
             <div className="stock-table">
               <table>
                 <thead>
                   <tr>
-                    <th>Склад</th>
-                    <th>Тип</th>
-                    <th>Локация</th>
-                    <th>Количество</th>
-                    <th>Зарезервировано</th>
-                    <th>Доступно</th>
+                    <th>{t('batchDetail.stock.warehouse')}</th>
+                    <th>{t('batchDetail.stock.type')}</th>
+                    <th>{t('batchDetail.stock.location')}</th>
+                    <th>{t('batchDetail.stock.quantity')}</th>
+                    <th>{t('batchDetail.stock.reserved')}</th>
+                    <th>{t('batchDetail.stock.available')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -369,7 +371,7 @@ const BatchDetailPage: React.FC = () => {
                     const available = Math.max(Number(item.quantity ?? 0) - Number(item.reserved ?? 0), 0)
                     return (
                       <tr key={item.id}>
-                        <td>{item.warehouse?.name || 'Неизвестный склад'}</td>
+                        <td>{item.warehouse?.name || t('batchDetail.stock.unknownWarehouse')}</td>
                         <td>{item.warehouse?.type || '—'}</td>
                         <td>{item.warehouse?.location || '—'}</td>
                         <td className="quantity-cell">{item.quantity} {batch.unit}</td>
@@ -382,12 +384,12 @@ const BatchDetailPage: React.FC = () => {
               </table>
             </div>
           ) : (
-            <p className="no-stock">Нет запасов</p>
+            <p className="no-stock">{t('batchDetail.stock.empty')}</p>
           )}
         </section>
 
         <section className="documents-section">
-          <h2>Документы</h2>
+          <h2>{t('batchDetail.sections.documents')}</h2>
           <div
             className={`upload-area ${file ? 'dragover' : ''}`}
             onDrop={(e) => {
@@ -399,17 +401,17 @@ const BatchDetailPage: React.FC = () => {
             onDragOver={(e) => e.preventDefault()}
           >
             <div className="upload-controls">
-              <label className="field-label" htmlFor="document-type">Тип документа</label>
+              <label className="field-label" htmlFor="document-type">{t('batchDetail.documents.type')}</label>
               <select
                 id="document-type"
                 value={documentType}
                 onChange={(e) => setDocumentType(e.target.value)}
                 className="doc-type-select"
               >
-                <option value="GENERAL">Общий</option>
-                <option value="CERTIFICATE">Сертификат</option>
-                <option value="INVOICE">Счет</option>
-                <option value="SPEC">Спецификация</option>
+                <option value="GENERAL">{t('batchDetail.documents.types.GENERAL')}</option>
+                <option value="CERTIFICATE">{t('batchDetail.documents.types.CERTIFICATE')}</option>
+                <option value="INVOICE">{t('batchDetail.documents.types.INVOICE')}</option>
+                <option value="SPEC">{t('batchDetail.documents.types.SPEC')}</option>
               </select>
             </div>
             <input
@@ -423,9 +425,9 @@ const BatchDetailPage: React.FC = () => {
               disabled={!file || uploadDocumentMutation.isPending}
               className={`upload-btn ${uploadDocumentMutation.isPending ? 'uploading' : ''}`}
             >
-              {uploadDocumentMutation.isPending ? 'Загрузка...' : 'Загрузить документ'}
+              {uploadDocumentMutation.isPending ? t('batchDetail.documents.uploading') : t('batchDetail.documents.upload')}
             </button>
-            {file && <span>Выбран: {file.name} ({formatFileSize(file.size)})</span>}
+            {file && <span>{t('batchDetail.documents.selected', { name: file.name, size: formatFileSize(file.size) })}</span>}
           </div>
 
           {batch.documents?.length ? (
@@ -445,7 +447,7 @@ const BatchDetailPage: React.FC = () => {
                       <span className="file-size">
                         {formatFileSize(doc.fileSize)}
                       </span>
-                      <span>{doc.type || 'GENERAL'}</span>
+                      <span>{t(`batchDetail.documents.types.${doc.type}`, { defaultValue: doc.type || 'GENERAL' })}</span>
                       <span>{formatDateTime(doc.uploadDate)}</span>
                     </div>
                   </div>
@@ -455,7 +457,7 @@ const BatchDetailPage: React.FC = () => {
                       className="delete-btn"
                       disabled={uploadDocumentMutation.isPending}
                     >
-                      Удалить
+                      {t('batchDetail.documents.delete')}
                     </button>
                   </div>
                 </li>
@@ -463,7 +465,7 @@ const BatchDetailPage: React.FC = () => {
             </ul>
           ) : (
             <div className="no-documents">
-              Документы отсутствуют
+              {t('batchDetail.documents.empty')}
             </div>
           )}
         </section>

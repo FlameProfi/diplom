@@ -19,6 +19,14 @@
         },
         "runtime": {
           "Backend.dll": {}
+        },
+        "resources": {
+          "en/Backend.resources.dll": {
+            "locale": "en"
+          },
+          "ru/Backend.resources.dll": {
+            "locale": "ru"
+          }
         }
       },
       "AutoMapper/12.0.0": {
