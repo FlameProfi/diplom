@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import api from '../../services/api'
 import './OrdersPage.scss'
 
@@ -22,17 +23,19 @@ interface CreateOrderForm {
   orderItems: OrderItemForm[]
 }
 
-const statusOptions = [
-  { value: 'NEW', label: 'Новый' },
-  { value: 'IN_PRODUCTION', label: 'В производстве' },
-  { value: 'PACKED', label: 'Упакован' },
-  { value: 'READY_FOR_SHIPMENT', label: 'Готов к отгрузке' },
-  { value: 'SHIPPED', label: 'Отгружен' },
-  { value: 'DELIVERED', label: 'Доставлен' },
-  { value: 'CANCELLED', label: 'Отменён' },
-]
-
 const OrdersPage = () => {
+  const { t } = useTranslation()
+
+  const statusOptions = [
+    { value: 'NEW', label: t('orders.statuses.NEW') },
+    { value: 'IN_PRODUCTION', label: t('orders.statuses.IN_PRODUCTION') },
+    { value: 'PACKED', label: t('orders.statuses.PACKED') },
+    { value: 'READY_FOR_SHIPMENT', label: t('orders.statuses.READY_FOR_SHIPMENT') },
+    { value: 'SHIPPED', label: t('orders.statuses.SHIPPED') },
+    { value: 'DELIVERED', label: t('orders.statuses.DELIVERED') },
+    { value: 'CANCELLED', label: t('orders.statuses.CANCELLED') },
+  ]
+
   const queryClient = useQueryClient()
   const [searchParams, setSearchParams] = useSearchParams()
   const [showForm, setShowForm] = useState(false)
@@ -75,7 +78,7 @@ const OrdersPage = () => {
     },
     onError: (error: any) => {
       console.error('Creation error:', error)
-      alert(`Ошибка создания: ${error.response?.data?.message || error.message}`)
+      alert(t('orders.errors.create', { message: error.response?.data?.message || error.message }))
     },
   })
 
@@ -85,7 +88,7 @@ const OrdersPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] })
     },
-    onError: (error: any) => alert(`Ошибка обновления: ${error.message}`),
+    onError: (error: any) => alert(t('orders.errors.update', { message: error.message })),
   })
 
   const { register, handleSubmit, reset, control, watch, setValue } = useForm<CreateOrderForm>({
@@ -140,13 +143,13 @@ const OrdersPage = () => {
 
   const onSubmit = (data: CreateOrderForm) => {
     if (!isValidDelivery) {
-      alert('Дата доставки должна быть не раньше сегодня')
+      alert(t('orders.errors.deliveryDate'))
       return
     }
 
     const filteredItems = data.orderItems.filter((item) => item.batchId)
     if (filteredItems.length === 0) {
-      alert('Добавьте хотя бы одну позицию с партией')
+      alert(t('orders.errors.noItems'))
       return
     }
 
@@ -157,41 +160,41 @@ const OrdersPage = () => {
     })
   }
 
-  if (ordersLoading || customersLoading || batchesLoading) return <div className="loading">Загрузка...</div>
-  if (ordersError || customersError || batchesError) return <div className="error">Ошибка загрузки данных</div>
+  if (ordersLoading || customersLoading || batchesLoading) return <div className="loading">{t('orders.loading')}</div>
+  if (ordersError || customersError || batchesError) return <div className="error">{t('orders.errors.loading')}</div>
 
   return (
     <div className="orders-page">
       <header className="page-header">
         <div>
-          <h1>Заказы</h1>
-          <p className="subtitle">Контроль заказов, статусов и составов партий</p>
+          <h1>{t('orders.title')}</h1>
+          <p className="subtitle">{t('orders.subtitle')}</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
           className="btn btn-primary"
           disabled={createMutation.isPending}
         >
-          {showForm ? 'Отмена' : 'Новый заказ'}
+          {showForm ? t('orders.actions.cancel') : t('orders.actions.new')}
         </button>
       </header>
 
       <section className="summary">
         <div className="summary-card">
-          <span className="label">Всего заказов</span>
+          <span className="label">{t('orders.summary.total')}</span>
           <strong>{orders.length}</strong>
         </div>
         <div className="summary-card">
-          <span className="label">Новые</span>
+          <span className="label">{t('orders.summary.new')}</span>
           <strong>{ordersStats.newOrders}</strong>
         </div>
         <div className="summary-card">
-          <span className="label">В производстве</span>
+          <span className="label">{t('orders.summary.inProduction')}</span>
           <strong>{ordersStats.inProduction}</strong>
         </div>
         <div className="summary-card accent">
-          <span className="label">Сумма заказов</span>
-          <strong>{ordersStats.totalRevenue.toLocaleString('ru-RU')} ₽</strong>
+          <span className="label">{t('orders.summary.totalAmount')}</span>
+          <strong>{ordersStats.totalRevenue.toLocaleString(i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽</strong>
         </div>
       </section>
 
@@ -199,13 +202,13 @@ const OrdersPage = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="order-form">
           <div className="form-grid">
             <div className="form-field">
-              <label htmlFor="orderNumber">Номер заказа</label>
-              <input id="orderNumber" {...register('orderNumber', { required: true })} placeholder="ORDER-XXX" />
+              <label htmlFor="orderNumber">{t('orders.form.orderNumber')}</label>
+              <input id="orderNumber" {...register('orderNumber', { required: true })} placeholder={t('orders.form.orderNumberPlaceholder')} />
             </div>
             <div className="form-field">
-              <label htmlFor="customerId">Клиент</label>
+              <label htmlFor="customerId">{t('orders.form.customer')}</label>
               <select id="customerId" {...register('customerId', { required: true })}>
-                <option value="">Выберите клиента</option>
+                <option value="">{t('orders.form.selectCustomer')}</option>
                 {customers.map((customer: any) => (
                   <option key={customer.id} value={customer.id}>
                     {customer.name}
@@ -214,7 +217,7 @@ const OrdersPage = () => {
               </select>
             </div>
             <div className="form-field">
-              <label htmlFor="status">Статус</label>
+              <label htmlFor="status">{t('orders.form.status')}</label>
               <select id="status" {...register('status')}>
                 {statusOptions.map((status) => (
                   <option key={status.value} value={status.value}>
@@ -224,34 +227,34 @@ const OrdersPage = () => {
               </select>
             </div>
             <div className="form-field">
-              <label htmlFor="expectedDelivery">Ожидаемая доставка</label>
+              <label htmlFor="expectedDelivery">{t('orders.form.expectedDelivery')}</label>
               <input
                 id="expectedDelivery"
                 type="date"
                 {...register('expectedDelivery', { min: currentDate })}
                 min={currentDate}
               />
-              {!isValidDelivery && <span className="error-text">Дата должна быть в будущем</span>}
+              {!isValidDelivery && <span className="error-text">{t('orders.form.deliveryError')}</span>}
             </div>
             <div className="form-field full">
-              <label htmlFor="productionNotes">Примечания производства</label>
+              <label htmlFor="productionNotes">{t('orders.form.productionNotes')}</label>
               <textarea id="productionNotes" {...register('productionNotes')} rows={2} />
             </div>
             <div className="form-field full">
-              <label htmlFor="packingNotes">Примечания упаковки</label>
+              <label htmlFor="packingNotes">{t('orders.form.packingNotes')}</label>
               <textarea id="packingNotes" {...register('packingNotes')} rows={2} />
             </div>
           </div>
 
           <div className="order-items">
             <div className="order-items-header">
-              <h3>Позиции заказа</h3>
-              <div className="total">Итого: {totalAmount.toLocaleString('ru-RU')} ₽</div>
+              <h3>{t('orders.form.itemsTitle')}</h3>
+              <div className="total">{t('orders.form.total', { amount: totalAmount.toLocaleString(i18n.language === 'ru' ? 'ru-RU' : 'en-US') })}</div>
             </div>
             {fields.map((field, index) => (
               <div key={field.id} className="item-row">
                 <select {...register(`orderItems.${index}.batchId`, { required: true })}>
-                  <option value="">Выберите партию</option>
+                  <option value="">{t('orders.form.selectBatch')}</option>
                   {batches.map((batch: any) => (
                     <option key={batch.id} value={batch.id}>
                       {batch.batchNumber} ({batch.quantity} {batch.unit})
@@ -261,16 +264,16 @@ const OrdersPage = () => {
                 <input
                   type="number"
                   {...register(`orderItems.${index}.quantity`, { min: 1, valueAsNumber: true })}
-                  placeholder="Кол-во"
+                  placeholder={t('orders.form.quantity')}
                 />
                 <input
                   type="number"
                   {...register(`orderItems.${index}.price`, { min: 0, valueAsNumber: true })}
-                  placeholder="Цена за ед."
+                  placeholder={t('orders.form.price')}
                   step="0.01"
                 />
                 <button type="button" className="btn btn-outline" onClick={() => remove(index)}>
-                  Удалить
+                  {t('orders.actions.delete')}
                 </button>
               </div>
             ))}
@@ -279,12 +282,12 @@ const OrdersPage = () => {
               className="btn btn-secondary"
               onClick={() => append({ batchId: '', quantity: 1, price: 0 })}
             >
-              + Добавить позицию
+              {t('orders.actions.addPosition')}
             </button>
           </div>
 
           <button type="submit" className="btn btn-success" disabled={createMutation.isPending}>
-            {createMutation.isPending ? 'Создаётся...' : 'Создать заказ'}
+            {createMutation.isPending ? t('orders.actions.creating') : t('orders.actions.create')}
           </button>
         </form>
       )}
@@ -294,7 +297,7 @@ const OrdersPage = () => {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Поиск по номеру или клиенту..."
+          placeholder={t('orders.filters.searchPlaceholder')}
           className="search-input"
         />
         {customerIdParam && (
@@ -303,7 +306,7 @@ const OrdersPage = () => {
             className="btn btn-outline"
             onClick={() => setSearchParams({})}
           >
-            Сбросить фильтр клиента
+            {t('orders.actions.resetFilter')}
           </button>
         )}
         <select
@@ -311,7 +314,7 @@ const OrdersPage = () => {
           onChange={(e) => setFilterStatus(e.target.value)}
           className="status-filter"
         >
-          <option value="ALL">Все статусы</option>
+          <option value="ALL">{t('orders.filters.allStatuses')}</option>
           {statusOptions.map((status) => (
             <option key={status.value} value={status.value}>
               {status.label}
@@ -324,14 +327,14 @@ const OrdersPage = () => {
         <table className="orders-table">
           <thead>
             <tr>
-              <th>Номер</th>
-              <th>Клиент</th>
-              <th>Статус</th>
-              <th>Позиции</th>
-              <th>Сумма</th>
-              <th>Создан</th>
-              <th>Доставка</th>
-              <th>Действия</th>
+              <th>{t('orders.table.number')}</th>
+              <th>{t('orders.table.customer')}</th>
+              <th>{t('orders.table.status')}</th>
+              <th>{t('orders.table.items')}</th>
+              <th>{t('orders.table.amount')}</th>
+              <th>{t('orders.table.created')}</th>
+              <th>{t('orders.table.delivery')}</th>
+              <th>{t('orders.table.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -351,11 +354,11 @@ const OrdersPage = () => {
                         .join(', ')
                     : '—'}
                 </td>
-                <td>{(order.totalAmount || 0).toLocaleString('ru-RU')} ₽</td>
-                <td>{order.createdAt ? new Date(order.createdAt).toLocaleDateString('ru-RU') : '—'}</td>
+                <td>{(order.totalAmount || 0).toLocaleString(i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽</td>
+                <td>{order.createdAt ? new Date(order.createdAt).toLocaleDateString(i18n.language === 'ru' ? 'ru-RU' : 'en-US') : '—'}</td>
                 <td>
                   {order.expectedDelivery
-                    ? new Date(order.expectedDelivery).toLocaleDateString('ru-RU')
+                    ? new Date(order.expectedDelivery).toLocaleDateString(i18n.language === 'ru' ? 'ru-RU' : 'en-US')
                     : '—'}
                 </td>
                 <td>
@@ -379,7 +382,7 @@ const OrdersPage = () => {
             ))}
           </tbody>
         </table>
-        {filteredOrders.length === 0 && <div className="empty-state">Заказы не найдены</div>}
+        {filteredOrders.length === 0 && <div className="empty-state">{t('orders.table.empty')}</div>}
       </div>
     </div>
   )

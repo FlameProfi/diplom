@@ -5,6 +5,7 @@ using Backend.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 
 namespace Backend.Controllers;
 
@@ -15,11 +16,13 @@ public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly IJwtTokenService _jwtTokenService;
+    private readonly IStringLocalizer<AuthController> _localizer;
 
-    public AuthController(AppDbContext context, IJwtTokenService jwtTokenService)
+    public AuthController(AppDbContext context, IJwtTokenService jwtTokenService, IStringLocalizer<AuthController> localizer)
     {
         _context = context;
         _jwtTokenService = jwtTokenService;
+        _localizer = localizer;
     }
 
     [HttpPost("login")]
@@ -31,13 +34,13 @@ public class AuthController : ControllerBase
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
         if (user == null || string.IsNullOrWhiteSpace(user.PasswordHash))
         {
-            return Unauthorized("Неверный email или пароль");
+            return Unauthorized(_localizer["InvalidCredentials"].Value);
         }
 
         var isValidPassword = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
         if (!isValidPassword)
         {
-            return Unauthorized("Неверный email или пароль");
+            return Unauthorized(_localizer["InvalidCredentials"].Value);
         }
 
         var (token, expiresAtUtc) = _jwtTokenService.GenerateToken(user);

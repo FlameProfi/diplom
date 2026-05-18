@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import BarcodeDisplay from '../../components/BarcodeDisplay/BarcodeDisplay'
 import api from '../../services/api'
 import './BatchesPage.scss'
@@ -20,16 +21,18 @@ interface CreateBatchForm {
   minStock?: number
 }
 
-const statusOptions = [
-  { value: 'DRAFT', label: 'Черновик' },
-  { value: 'QUARANTINE', label: 'Карантин' },
-  { value: 'CERTIFIED', label: 'Сертифицирована' },
-  { value: 'ACTIVE', label: 'Активна' },
-  { value: 'SHIPPED', label: 'Отгружена' },
-  { value: 'SCRAPPED', label: 'Списана' },
-]
-
 const BatchesPage = () => {
+  const { t } = useTranslation()
+
+  const statusOptions = [
+    { value: 'DRAFT', label: t('batches.statuses.DRAFT') },
+    { value: 'QUARANTINE', label: t('batches.statuses.QUARANTINE') },
+    { value: 'CERTIFIED', label: t('batches.statuses.CERTIFIED') },
+    { value: 'ACTIVE', label: t('batches.statuses.ACTIVE') },
+    { value: 'SHIPPED', label: t('batches.statuses.SHIPPED') },
+    { value: 'SCRAPPED', label: t('batches.statuses.SCRAPPED') },
+  ]
+
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('ALL');
@@ -59,7 +62,7 @@ const BatchesPage = () => {
       reset()
     },
     onError: (error: any) => {
-      alert(`Ошибка создания партии: ${error.response?.data?.message || error.message}`)
+      alert(t('batches.createError', { message: error.response?.data?.message || error.message }))
     },
   })
 
@@ -119,26 +122,26 @@ const BatchesPage = () => {
     });
   }, [batches, search, filterStatus])
 
-  if (isLoading) return <div className="loading">Загрузка партий...</div>;
-  if (error) return <div className="error">Ошибка загрузки данных</div>;
+  if (isLoading) return <div className="loading">{t('batches.loading')}</div>;
+  if (error) return <div className="error">{t('batches.errorLoading')}</div>;
 
   return (
     <div className="batches-page">
       <header className="page-header">
         <div>
-          <h1>Партии продукции</h1>
-          <p className="subtitle">Создавайте новые партии и отслеживайте их статус</p>
+          <h1>{t('batches.title')}</h1>
+          <p className="subtitle">{t('batches.subtitle')}</p>
         </div>
         <div className="stats">
-          <span>Всего: {batches.length}</span>
-          <span className="active">Активных: {batches.filter((b: any) => b.status === 'ACTIVE').length}</span>
+          <span>{t('batches.stats.total', { count: batches.length })}</span>
+          <span className="active">{t('batches.stats.active', { count: batches.filter((b: any) => b.status === 'ACTIVE').length })}</span>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
           className="btn btn-primary"
           disabled={createMutation.isPending}
         >
-          {showForm ? 'Отмена' : 'Новая партия'}
+          {showForm ? t('batches.actions.cancel') : t('batches.actions.new')}
         </button>
       </header>
 
@@ -146,14 +149,14 @@ const BatchesPage = () => {
         <form className="batch-form" onSubmit={handleSubmit(onSubmit)}>
           <div className="form-grid">
             <div className="form-field">
-              <label htmlFor="batchNumber">Номер партии</label>
-              <input id="batchNumber" {...register('batchNumber')} placeholder="BATCH-2024-001" />
-              <span className="helper">Оставьте пустым для автогенерации</span>
+              <label htmlFor="batchNumber">{t('batches.form.batchNumber')}</label>
+              <input id="batchNumber" {...register('batchNumber')} placeholder={t('batches.form.batchNumberPlaceholder')} />
+              <span className="helper">{t('batches.form.batchNumberHelper')}</span>
             </div>
             <div className="form-field">
-              <label htmlFor="productTypeId">Тип продукта</label>
+              <label htmlFor="productTypeId">{t('batches.form.productType')}</label>
               <select id="productTypeId" {...register('productTypeId', { required: true })}>
-                <option value="">Выберите тип</option>
+                <option value="">{t('batches.form.productTypePlaceholder')}</option>
                 {productTypes.map((type: any) => (
                   <option key={type.id} value={type.id}>
                     {type.name}
@@ -162,7 +165,7 @@ const BatchesPage = () => {
               </select>
             </div>
             <div className="form-field">
-              <label htmlFor="quantity">Количество</label>
+              <label htmlFor="quantity">{t('batches.form.quantity')}</label>
               <input
                 id="quantity"
                 type="number"
@@ -172,11 +175,11 @@ const BatchesPage = () => {
               />
             </div>
             <div className="form-field">
-              <label htmlFor="unit">Единица измерения</label>
-              <input id="unit" {...register('unit', { required: true })} placeholder="кг, л, шт" />
+              <label htmlFor="unit">{t('batches.form.unit')}</label>
+              <input id="unit" {...register('unit', { required: true })} placeholder={t('batches.form.unitPlaceholder')} />
             </div>
             <div className="form-field">
-              <label htmlFor="status">Статус</label>
+              <label htmlFor="status">{t('batches.form.status')}</label>
               <select id="status" {...register('status')}>
                 {statusOptions.map((status) => (
                   <option key={status.value} value={status.value}>
@@ -186,23 +189,23 @@ const BatchesPage = () => {
               </select>
             </div>
             <div className="form-field">
-              <label htmlFor="productionDate">Дата производства</label>
+              <label htmlFor="productionDate">{t('batches.form.productionDate')}</label>
               <input id="productionDate" type="date" {...register('productionDate')} />
             </div>
             <div className="form-field">
-              <label htmlFor="expiryDate">Срок годности</label>
+              <label htmlFor="expiryDate">{t('batches.form.expiryDate')}</label>
               <input id="expiryDate" type="date" {...register('expiryDate')} />
             </div>
             <div className="form-field">
-              <label htmlFor="barcode">Штрих-код</label>
-              <input id="barcode" {...register('barcode')} placeholder="Сгенерируется автоматически" />
+              <label htmlFor="barcode">{t('batches.form.barcode')}</label>
+              <input id="barcode" {...register('barcode')} placeholder={t('batches.form.barcodePlaceholder')} />
             </div>
             <div className="form-field">
-              <label htmlFor="packagingType">Тип упаковки</label>
-              <input id="packagingType" {...register('packagingType')} placeholder="Бочка, коробка, палета" />
+              <label htmlFor="packagingType">{t('batches.form.packagingType')}</label>
+              <input id="packagingType" {...register('packagingType')} placeholder={t('batches.form.packagingTypePlaceholder')} />
             </div>
             <div className="form-field">
-              <label htmlFor="minStock">Минимальный остаток</label>
+              <label htmlFor="minStock">{t('batches.form.minStock')}</label>
               <input
                 id="minStock"
                 type="number"
@@ -214,10 +217,10 @@ const BatchesPage = () => {
           </div>
           <div className="form-actions">
             <button className="btn btn-primary" type="submit" disabled={createMutation.isPending}>
-              {createMutation.isPending ? 'Сохраняем...' : 'Создать партию'}
+              {createMutation.isPending ? t('batches.actions.save') : t('batches.actions.create')}
             </button>
             <button className="btn btn-secondary" type="button" onClick={() => { reset(); setShowForm(false); }}>
-              Сбросить
+              {t('batches.actions.reset')}
             </button>
           </div>
         </form>
@@ -226,7 +229,7 @@ const BatchesPage = () => {
       <div className="filters">
         <input
           type="text"
-          placeholder="Поиск по номеру или баркоду..."
+          placeholder={t('batches.filters.searchPlaceholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="search-input"
@@ -236,13 +239,13 @@ const BatchesPage = () => {
           onChange={(e) => setFilterStatus(e.target.value)}
           className="status-filter"
         >
-          <option value="ALL">Все статусы</option>
-          <option value="DRAFT">Черновик</option>
-          <option value="ACTIVE">Активные</option>
-          <option value="QUARANTINE">Карантин</option>
-          <option value="CERTIFIED">Сертифицирована</option>
-          <option value="SHIPPED">Отгружено</option>
-          <option value="SCRAPPED">Списано</option>
+          <option value="ALL">{t('batches.filters.allStatuses')}</option>
+          <option value="DRAFT">{t('batches.statuses.DRAFT')}</option>
+          <option value="ACTIVE">{t('batches.filters.active')}</option>
+          <option value="QUARANTINE">{t('batches.statuses.QUARANTINE')}</option>
+          <option value="CERTIFIED">{t('batches.statuses.CERTIFIED')}</option>
+          <option value="SHIPPED">{t('batches.filters.shipped')}</option>
+          <option value="SCRAPPED">{t('batches.filters.scrapped')}</option>
         </select>
       </div>
 
@@ -250,12 +253,12 @@ const BatchesPage = () => {
         <table className="batches-table">
           <thead>
             <tr>
-              <th>Номер</th>
-              <th>Тип</th>
-              <th>Кол-во</th>
-              <th>Баркод</th>
-              <th>Статус</th>
-              <th>Действия</th>
+              <th>{t('batches.table.number')}</th>
+              <th>{t('batches.table.type')}</th>
+              <th>{t('batches.table.quantity')}</th>
+              <th>{t('batches.table.barcode')}</th>
+              <th>{t('batches.table.status')}</th>
+              <th>{t('batches.table.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -281,14 +284,14 @@ const BatchesPage = () => {
                 </td>
                 <td>
                   <button className="btn btn-sm" 
-                  onClick={() => navigate(`/batches/${batch.id}`)}>Подробно</button>
+                  onClick={() => navigate(`/batches/${batch.id}`)}>{t('batches.actions.details')}</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
         {filteredBatches.length === 0 && (
-          <div className="empty-state">Партии не найдены</div>
+          <div className="empty-state">{t('batches.table.empty')}</div>
         )}
       </div>
     </div>
@@ -297,12 +300,14 @@ const BatchesPage = () => {
 
 // Вспомогательная функция
 const getStatusText = (status: string) => {
+  const { t } = useTranslation()
   const map: Record<string, string> = {
-    ACTIVE: 'Активна',
-    QUARANTINE: 'Карантин',
-    CERTIFIED: 'Сертифицирована',
-    SHIPPED: 'Отгружена',
-    SCRAPPED: 'Списана',
+    DRAFT: t('batches.statuses.DRAFT'),
+    ACTIVE: t('batches.statuses.ACTIVE'),
+    QUARANTINE: t('batches.statuses.QUARANTINE'),
+    CERTIFIED: t('batches.statuses.CERTIFIED'),
+    SHIPPED: t('batches.statuses.SHIPPED'),
+    SCRAPPED: t('batches.statuses.SCRAPPED'),
   };
   return map[status] || status;
 };

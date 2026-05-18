@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import api from '../../services/api'
 import './DashboardPage.scss'
 
 const DashboardPage = () => {
+  const { t, i18n } = useTranslation()
   const { data: batches = [], isLoading: batchesLoading, error: batchesError } = useQuery({
     queryKey: ['dashboard', 'batches'],
     queryFn: async () => {
@@ -66,9 +68,9 @@ const DashboardPage = () => {
     .slice(0, 5)
 
   const movementTypeLabels: Record<string, string> = {
-    RECEIPT: 'Приход',
-    ISSUE: 'Расход',
-    RESERVE: 'Резерв',
+    RECEIPT: t('dashboard.movements.types.RECEIPT'),
+    ISSUE: t('dashboard.movements.types.ISSUE'),
+    RESERVE: t('dashboard.movements.types.RESERVE'),
   }
 
   const recentMovements = [...movements]
@@ -79,94 +81,94 @@ const DashboardPage = () => {
     if (!value) return '—'
     const date = new Date(value)
     if (Number.isNaN(date.getTime())) return '—'
-    return date.toLocaleDateString('ru-RU')
+    return date.toLocaleDateString(i18n.language === 'ru' ? 'ru-RU' : 'en-US')
   }
 
   if (isLoading) {
-    return <div className="dashboard-state">Загрузка данных...</div>
+    return <div className="dashboard-state">{t('dashboard.loading')}</div>
   }
 
   if (hasError) {
-    return <div className="dashboard-state error">Ошибка загрузки данных</div>
+    return <div className="dashboard-state error">{t('dashboard.error')}</div>
   }
 
   return (
     <div className="dashboard-page">
       <section className="summary-grid">
         <div className="summary-card">
-          <p className="summary-label">Всего партий</p>
+          <p className="summary-label">{t('dashboard.metrics.totalBatches')}</p>
           <h2>{batches.length}</h2>
-          <span className="summary-meta">Активные: {activeBatches}</span>
+          <span className="summary-meta">{t('dashboard.metrics.activeBatches', { count: activeBatches })}</span>
         </div>
         <div className="summary-card">
-          <p className="summary-label">Остаток на складе</p>
+          <p className="summary-label">{t('dashboard.metrics.warehouseStock')}</p>
           <h2>{totalStock.toFixed(1)}</h2>
-          <span className="summary-meta">В резерве: {reservedStock.toFixed(1)}</span>
+          <span className="summary-meta">{t('dashboard.metrics.inReserve', { count: reservedStock.toFixed(1) })}</span>
         </div>
         <div className="summary-card">
-          <p className="summary-label">Заказы</p>
+          <p className="summary-label">{t('dashboard.metrics.orders')}</p>
           <h2>{orders.length}</h2>
-          <span className="summary-meta">Новых: {pendingOrders}</span>
+          <span className="summary-meta">{t('dashboard.metrics.newOrders', { count: pendingOrders })}</span>
         </div>
         <div className="summary-card">
-          <p className="summary-label">Клиенты</p>
+          <p className="summary-label">{t('dashboard.metrics.customers')}</p>
           <h2>{customers.length}</h2>
-          <span className="summary-meta">Активных контрактов: {activeContracts}</span>
+          <span className="summary-meta">{t('dashboard.metrics.activeContracts', { count: activeContracts })}</span>
         </div>
         <div className="summary-card">
-          <p className="summary-label">Контракты</p>
+          <p className="summary-label">{t('dashboard.metrics.contracts')}</p>
           <h2>{contracts.length}</h2>
-          <span className="summary-meta">В работе: {activeContracts}</span>
+          <span className="summary-meta">{t('dashboard.metrics.inProgress', { count: activeContracts })}</span>
         </div>
       </section>
 
       <section className="dashboard-panels">
         <div className="panel">
           <div className="panel-header">
-            <h3>Последние партии</h3>
-            <span>Обновлено сегодня</span>
+            <h3>{t('dashboard.recentBatches.title')}</h3>
+            <span>{t('dashboard.recentBatches.updatedToday')}</span>
           </div>
           <div className="panel-body">
             {batches.slice(0, 5).map((batch: any) => (
               <div key={batch.id} className="panel-row">
                 <div>
                   <p className="row-title">{batch.batchNumber}</p>
-                  <span className="row-subtitle">{batch.productType?.name || batch.productTypeName || 'Без типа'}</span>
+                  <span className="row-subtitle">{batch.productType?.name || batch.productTypeName || t('dashboard.recentBatches.noType')}</span>
                 </div>
                 <div className={`status-pill status-${String(batch.status).toLowerCase()}`}>
                   {batch.status}
                 </div>
               </div>
             ))}
-            {batches.length === 0 && <p className="empty-state">Партии не найдены</p>}
+            {batches.length === 0 && <p className="empty-state">{t('dashboard.recentBatches.empty')}</p>}
           </div>
         </div>
 
         <div className="panel">
           <div className="panel-header">
-            <h3>Заказы в работе</h3>
-            <span>Текущий месяц</span>
+            <h3>{t('dashboard.activeOrders.title')}</h3>
+            <span>{t('dashboard.activeOrders.currentMonth')}</span>
           </div>
           <div className="panel-body">
             {orders.slice(0, 5).map((order: any) => (
               <div key={order.id} className="panel-row">
                 <div>
                   <p className="row-title">{order.orderNumber}</p>
-                  <span className="row-subtitle">{order.customerName || 'Клиент не указан'}</span>
+                  <span className="row-subtitle">{order.customerName || t('dashboard.activeOrders.noCustomer')}</span>
                 </div>
                 <div className="panel-amount">
                   {order.totalAmount ? `${order.totalAmount} ${order.currency || ''}` : '—'}
                 </div>
               </div>
             ))}
-            {orders.length === 0 && <p className="empty-state">Заказы не найдены</p>}
+            {orders.length === 0 && <p className="empty-state">{t('dashboard.activeOrders.empty')}</p>}
           </div>
         </div>
 
         <div className="panel">
           <div className="panel-header">
-            <h3>Новые клиенты</h3>
-            <span>Последние регистрации</span>
+            <h3>{t('dashboard.newCustomers.title')}</h3>
+            <span>{t('dashboard.newCustomers.recentRegistrations')}</span>
           </div>
           <div className="panel-body">
             {recentCustomers.map((customer: any) => (
@@ -174,7 +176,7 @@ const DashboardPage = () => {
                 <div>
                   <p className="row-title">{customer.name}</p>
                   <span className="row-subtitle">
-                    {customer.region || customer.country || 'Регион не указан'}
+                    {customer.region || customer.country || t('dashboard.newCustomers.noRegion')}
                   </span>
                 </div>
                 <div className="panel-amount">
@@ -182,14 +184,14 @@ const DashboardPage = () => {
                 </div>
               </div>
             ))}
-            {recentCustomers.length === 0 && <p className="empty-state">Клиенты не найдены</p>}
+            {recentCustomers.length === 0 && <p className="empty-state">{t('dashboard.newCustomers.empty')}</p>}
           </div>
         </div>
 
         <div className="panel">
           <div className="panel-header">
-            <h3>Движения на складе</h3>
-            <span>Последние операции</span>
+            <h3>{t('dashboard.movements.title')}</h3>
+            <span>{t('dashboard.movements.recentOperations')}</span>
           </div>
           <div className="panel-body">
             {recentMovements.map((movement: any) => {
@@ -210,7 +212,7 @@ const DashboardPage = () => {
                 </div>
               )
             })}
-            {recentMovements.length === 0 && <p className="empty-state">Операции не найдены</p>}
+            {recentMovements.length === 0 && <p className="empty-state">{t('dashboard.movements.empty')}</p>}
           </div>
         </div>
       </section>

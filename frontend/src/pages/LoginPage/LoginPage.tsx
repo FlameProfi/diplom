@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useTranslation } from 'react-i18next'
 import api from '../../services/api'
 import logo from '../../assets/logo.png'
 import './LoginPage.css'
@@ -10,6 +11,7 @@ interface LoginResponse {
 }
 
 const LoginPage = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -27,7 +29,7 @@ const LoginPage = () => {
       login(response.data.accessToken);
       navigate('/warehouse');
     } catch (err) {
-      setError('Неверный email или пароль');
+      setError(t('login.error'));
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -39,34 +41,34 @@ const LoginPage = () => {
       <div className="login-card">
         <div className="login-header">
           <img src={logo} alt="Metal Factory Logo" className="login-logo" />
-          <h1 className="login-title">Добро пожаловать</h1>
-          <p className="login-subtitle">Войдите в систему Metal Factory ERP</p>
+          <h1 className="login-title">{t('login.title')}</h1>
+          <p className="login-subtitle">{t('login.subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
-            <label htmlFor="email" className="form-label">Email</label>
+            <label htmlFor="email" className="form-label">{t('login.email')}</label>
             <input
               id="email"
               type="email"
               className="form-input"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Введите ваш email"
+              placeholder={t('login.emailPlaceholder')}
               required
               disabled={isLoading}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="password" className="form-label">Пароль</label>
+            <label htmlFor="password" className="form-label">{t('login.password')}</label>
             <input
               id="password"
               type="password"
               className="form-input"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Введите пароль"
+              placeholder={t('login.passwordPlaceholder')}
               required
               disabled={isLoading}
             />
@@ -79,7 +81,7 @@ const LoginPage = () => {
             className="login-button"
             disabled={isLoading}
           >
-            {isLoading ? 'Вход...' : 'Войти'}
+            {isLoading ? t('login.loading') : t('login.submit')}
           </button>
         </form>
       </div>

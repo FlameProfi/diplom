@@ -1,0 +1,457 @@
+{
+  "login": {
+    "title": "Добро пожаловать",
+    "subtitle": "Войдите в систему Metal Factory ERP",
+    "email": "Email",
+    "emailPlaceholder": "Введите ваш email",
+    "password": "Пароль",
+    "passwordPlaceholder": "Введите пароль",
+    "submit": "Войти",
+    "loading": "Вход...",
+    "error": "Неверный email или пароль"
+  },
+  "layout": {
+    "brandSubtitle": "Склад и производство",
+    "nav": {
+      "dashboard": "Обзор",
+      "warehouse": "Склад",
+      "batches": "Партии",
+      "orders": "Заказы",
+      "customers": "Клиенты"
+    },
+    "footerLabel": "Версия системы",
+    "topbarTitle": "Рабочая панель",
+    "topbarSubtitle": "Данные по производству и складу",
+    "actions": {
+      "export": "Экспорт",
+      "create": "Создать заявку"
+    }
+  },
+  "batches": {
+    "title": "Партии продукции",
+    "subtitle": "Создавайте новые партии и отслеживайте их статус",
+    "stats": {
+      "total": "Всего: {{count}}",
+      "active": "Активных: {{count}}"
+    },
+    "actions": {
+      "cancel": "Отмена",
+      "new": "Новая партия",
+      "save": "Сохраняем...",
+      "create": "Создать партию",
+      "reset": "Сбросить",
+      "details": "Подробно"
+    },
+    "form": {
+      "batchNumber": "Номер партии",
+      "batchNumberPlaceholder": "BATCH-2024-001",
+      "batchNumberHelper": "Оставьте пустым для автогенерации",
+      "productType": "Тип продукта",
+      "productTypePlaceholder": "Выберите тип",
+      "quantity": "Количество",
+      "unit": "Единица измерения",
+      "unitPlaceholder": "кг, л, шт",
+      "status": "Статус",
+      "productionDate": "Дата производства",
+      "expiryDate": "Срок годности",
+      "barcode": "Штрих-код",
+      "barcodePlaceholder": "Сгенерируется автоматически",
+      "packagingType": "Тип упаковки",
+      "packagingTypePlaceholder": "Бочка, коробка, палета",
+      "minStock": "Минимальный остаток"
+    },
+    "filters": {
+      "searchPlaceholder": "Поиск по номеру или баркоду...",
+      "allStatuses": "Все статусы",
+      "active": "Активные",
+      "shipped": "Отгружено",
+      "scrapped": "Списано"
+    },
+    "table": {
+      "number": "Номер",
+      "type": "Тип",
+      "quantity": "Кол-во",
+      "barcode": "Баркод",
+      "status": "Статус",
+      "actions": "Действия",
+      "empty": "Партии не найдены"
+    },
+    "statuses": {
+      "DRAFT": "Черновик",
+      "QUARANTINE": "Карантин",
+      "CERTIFIED": "Сертифицирована",
+      "ACTIVE": "Активна",
+      "SHIPPED": "Отгружена",
+      "SCRAPPED": "Списана"
+    },
+    "loading": "Загрузка партий...",
+    "errorLoading": "Ошибка загрузки данных",
+    "createError": "Ошибка создания партии: {{message}}"
+  },
+  "warehouse": {
+    "title": "Панель склада",
+    "accessDenied": "Доступ ограничен",
+    "authRequired": "Для работы с складом необходимо авторизоваться",
+    "login": "Войти в систему",
+    "resetBatch": "Сбросить партию",
+    "logout": "Выйти",
+    "tabs": {
+      "scan": "Сканер",
+      "stock": "Остатки",
+      "reserve": "Резерв",
+      "notifications": "Уведомления",
+      "overview": "Обзор",
+      "movements": "Движения"
+    },
+    "scan": {
+      "manualInput": "Баркод вручную",
+      "find": "Найти",
+      "searching": "Идет поиск партии...",
+      "searchError": "Ошибка поиска партии: {{message}}",
+      "batchTitle": "Партия",
+      "number": "Номер",
+      "type": "Тип",
+      "quantity": "Остаток",
+      "reserve": "Резерв",
+      "available": "Доступно",
+      "status": "Статус",
+      "scanPrompt": "Отсканируйте партию, чтобы увидеть детали.",
+      "operationTitle": "Операция",
+      "opType": "Тип операции",
+      "warehouse": "Склад",
+      "defaultWarehouse": "По умолчанию",
+      "quantityLabel": "Количество",
+      "quantityPlaceholder": "Количество",
+      "reason": "Причина",
+      "reasonPlaceholder": "Комментарий к операции",
+      "submit": "Выполнить",
+      "saving": "Сохранение...",
+      "loadWarehousesError": "Ошибка загрузки складов: {{message}}",
+      "loadingWarehouses": "Загружаем список складов...",
+      "receipt": "Приёмка",
+      "issue": "Отпуск",
+      "reserveOp": "Резерв",
+      "movementSuccess": "Движение успешно создано!",
+      "sessionExpired": "Сессия истекла. Перезайдите в систему.",
+      "forbidden": "Недостаточно прав для выполнения операции.",
+      "createError": "Ошибка создания движения: {{message}}",
+      "scanRequired": "Сначала отсканируйте или найдите партию",
+      "quantityRequired": "Введите количество больше 0",
+      "insufficientStock": "Недостаточно доступного товара. Доступно: {{count}}",
+      "authPrompt": "Пожалуйста, авторизуйтесь для работы с системой"
+    },
+    "stock": {
+      "searchPlaceholder": "Поиск по партии или складу",
+      "allWarehouses": "Все склады",
+      "loading": "Загружаем остатки...",
+      "error": "Ошибка загрузки остатков: {{message}}",
+      "table": {
+        "batch": "Партия",
+        "warehouse": "Склад",
+        "quantity": "Остаток",
+        "reserve": "Резерв",
+        "available": "Доступно"
+      },
+      "empty": "Остатки не найдены. Запустите seed или добавьте данные."
+    },
+    "reserve": {
+      "title": "Резерв под заказы",
+      "loadingOrders": "Загружаем заказы...",
+      "errorOrders": "Ошибка загрузки заказов: {{message}}",
+      "batchPrompt": "Партия для резерва: {{number}} (доступно: {{count}} {{unit}})",
+      "orderItem": "Позиция заказа",
+      "selectOrderItem": "Выберите позицию заказа",
+      "noOrdersForBatch": "Для этой партии нет заказов. Проверьте список заказов или выберите другую партию.",
+      "quantityForReserve": "Количество для резерва",
+      "reserveBtn": "Зарезервировать",
+      "reserving": "Резервирование...",
+      "scanFirst": "Сначала отсканируйте партию для резерва.",
+      "manualPrompt": "Либо выберите заказ и подтяните партию вручную:",
+      "selectOrder": "Выберите заказ",
+      "reserveSuccess": "Резерв успешно создан!",
+      "forbidden": "Недостаточно прав для создания резерва.",
+      "error": "Ошибка резерва: {{message}}"
+    },
+    "notifications": {
+      "title": "Уведомления",
+      "loading": "Загружаем уведомления...",
+      "error": "Ошибка загрузки уведомлений: {{message}}",
+      "empty": "Уведомлений нет. Создайте движение для генерации (low stock)."
+    },
+    "overview": {
+      "summary": "Сводка склада",
+      "total": "Всего",
+      "reserve": "В резерве",
+      "available": "Доступно",
+      "loading": "Загружаем сводку...",
+      "activeBatch": "Активная партия",
+      "notSelected": "Партия не выбрана.",
+      "currentWarehouse": "Текущий склад",
+      "default": "По умолчанию",
+      "errorWarehouses": "Ошибка загрузки складов: {{message}}"
+    },
+    "movements": {
+      "searchPlaceholder": "Поиск по партии, складу или пользователю",
+      "refresh": "Обновить",
+      "loading": "Загружаем движения...",
+      "error": "Ошибка загрузки движений: {{message}}",
+      "table": {
+        "date": "Дата",
+        "batch": "Партия",
+        "type": "Тип",
+        "quantity": "Количество",
+        "warehouse": "Склад",
+        "user": "Пользователь",
+        "comment": "Комментарий"
+      },
+      "empty": "Движений пока нет."
+    },
+    "processing": "Обработка..."
+  },
+  "orders": {
+    "title": "Заказы",
+    "subtitle": "Контроль заказов, статусов и составов партий",
+    "actions": {
+      "cancel": "Отмена",
+      "new": "Новый заказ",
+      "create": "Создать заказ",
+      "creating": "Создаётся...",
+      "resetFilter": "Сбросить фильтр клиента",
+      "delete": "Удалить",
+      "addPosition": "+ Добавить позицию"
+    },
+    "summary": {
+      "total": "Всего заказов",
+      "new": "Новые",
+      "inProduction": "В производстве",
+      "totalAmount": "Сумма заказов"
+    },
+    "form": {
+      "orderNumber": "Номер заказа",
+      "orderNumberPlaceholder": "ORDER-XXX",
+      "customer": "Клиент",
+      "selectCustomer": "Выберите клиента",
+      "status": "Статус",
+      "expectedDelivery": "Ожидаемая доставка",
+      "deliveryError": "Дата должна быть в будущем",
+      "productionNotes": "Примечания производства",
+      "packingNotes": "Примечания упаковки",
+      "itemsTitle": "Позиции заказа",
+      "total": "Итого: {{amount}} ₽",
+      "selectBatch": "Выберите партию",
+      "quantity": "Кол-во",
+      "price": "Цена за ед."
+    },
+    "filters": {
+      "searchPlaceholder": "Поиск по номеру или клиенту...",
+      "allStatuses": "Все статусы"
+    },
+    "table": {
+      "number": "Номер",
+      "customer": "Клиент",
+      "status": "Статус",
+      "items": "Позиции",
+      "amount": "Сумма",
+      "created": "Создан",
+      "delivery": "Доставка",
+      "actions": "Действия",
+      "empty": "Заказы не найдены"
+    },
+    "statuses": {
+      "NEW": "Новый",
+      "IN_PRODUCTION": "В производстве",
+      "PACKED": "Упакован",
+      "READY_FOR_SHIPMENT": "Готов к отгрузке",
+      "SHIPPED": "Отгружен",
+      "DELIVERED": "Доставлен",
+      "CANCELLED": "Отменён"
+    },
+    "errors": {
+      "deliveryDate": "Дата доставки должна быть не раньше сегодня",
+      "noItems": "Добавьте хотя бы одну позицию с партией",
+      "create": "Ошибка создания: {{message}}",
+      "update": "Ошибка обновления: {{message}}",
+      "loading": "Ошибка загрузки данных"
+    },
+    "loading": "Загрузка..."
+  },
+  "batchDetail": {
+    "title": "Подробно: {{number}}",
+    "back": "Назад",
+    "loading": "Загрузка...",
+    "error": "Ошибка: {{message}}",
+    "notFound": "Партия не найдена",
+    "sections": {
+      "main": "Основная информация",
+      "summary": "Сводка по количеству",
+      "label": "Этикетка продукции",
+      "movements": "Движения",
+      "stock": "Запасы по складам",
+      "documents": "Документы"
+    },
+    "fields": {
+      "number": "Номер партии",
+      "barcode": "Штрих-код",
+      "notSpecified": "Не указан",
+      "show": "Показать",
+      "hide": "Скрыть",
+      "productType": "Тип продукта",
+      "unit": "Единица измерения",
+      "created": "Создана",
+      "status": "Статус",
+      "updating": "Обновление...",
+      "total": "Всего",
+      "reserved": "Зарезервировано",
+      "available": "Доступно"
+    },
+    "label": {
+      "description": "Генерация и печать этикеток с параметрами продукции.",
+      "title": "Этикетка партии",
+      "size": "Размер",
+      "composition": "Состав",
+      "productionDate": "Дата выпуска",
+      "print": "Печать этикетки",
+      "printWindowError": "Не удалось открыть окно печати. Разрешите всплывающие окна.",
+      "printWindowTitle": "Этикетка партии {{number}}"
+    },
+    "movements": {
+      "empty": "Нет движений",
+      "types": {
+        "IN": "Поступление",
+        "OUT": "Списание",
+        "MOVE": "Перемещение",
+        "RESERVE": "Резерв",
+        "RELEASE": "Снятие резерва"
+      }
+    },
+    "stock": {
+      "warehouse": "Склад",
+      "type": "Тип",
+      "location": "Локация",
+      "quantity": "Количество",
+      "reserved": "Зарезервировано",
+      "available": "Доступно",
+      "unknownWarehouse": "Неизвестный склад",
+      "empty": "Нет запасов"
+    },
+    "documents": {
+      "type": "Тип документа",
+      "types": {
+        "GENERAL": "Общий",
+        "CERTIFICATE": "Сертификат",
+        "INVOICE": "Счет",
+        "SPEC": "Спецификация"
+      },
+      "upload": "Загрузить документ",
+      "uploading": "Загрузка...",
+      "selected": "Выбран: {{name}} ({{size}})",
+      "delete": "Удалить",
+      "empty": "Документы отсутствуют",
+      "deleteConfirm": "Удалить документ?",
+      "deleteError": "Ошибка удаления файла",
+      "uploadError": "Ошибка загрузки файла",
+      "statusUpdateError": "Ошибка обновления статуса"
+    }
+  },
+  "customers": {
+    "title": "Клиенты",
+    "stats": {
+      "total": "Всего: {{count}}",
+      "regions": "Регионов: {{count}}"
+    },
+    "actions": {
+      "cancel": "Отмена",
+      "new": "Новый клиент",
+      "create": "Создать клиента",
+      "creating": "Создаётся..."
+    },
+    "form": {
+      "name": "Название клиента",
+      "namePlaceholder": "ООО МеталлПром",
+      "phone": "Телефон",
+      "region": "Регион",
+      "regionPlaceholder": "Московская область",
+      "country": "Страна",
+      "countryPlaceholder": "Россия",
+      "address": "Адрес",
+      "addressPlaceholder": "Адрес доставки или офиса",
+      "taxId": "Налоговый ID",
+      "taxIdPlaceholder": "ИНН/КПП"
+    },
+    "filters": {
+      "searchPlaceholder": "Поиск по названию, email или телефону...",
+      "regionPlaceholder": "Фильтр по региону (сервер)"
+    },
+    "table": {
+      "name": "Название",
+      "phone": "Телефон",
+      "region": "Регион",
+      "country": "Страна",
+      "address": "Адрес",
+      "taxId": "Налоговый ID",
+      "created": "Создан",
+      "orders": "Заказы",
+      "ordersCount": "{{count}} заказов",
+      "empty": "Клиенты не найдены"
+    },
+    "errors": {
+      "create": "Ошибка создания: {{message}}",
+      "loading": "Ошибка загрузки клиентов"
+    },
+    "loading": "Загрузка клиентов..."
+  },
+  "dashboard": {
+    "loading": "Загрузка данных...",
+    "error": "Ошибка загрузки данных",
+    "metrics": {
+      "totalBatches": "Всего партий",
+      "activeBatches": "Активные: {{count}}",
+      "warehouseStock": "Остаток на складе",
+      "inReserve": "В резерве: {{count}}",
+      "orders": "Заказы",
+      "newOrders": "Новых: {{count}}",
+      "customers": "Клиенты",
+      "activeContracts": "Активных контрактов: {{count}}",
+      "contracts": "Контракты",
+      "inProgress": "В работе: {{count}}"
+    },
+    "recentBatches": {
+      "title": "Последние партии",
+      "updatedToday": "Обновлено сегодня",
+      "noType": "Без типа",
+      "empty": "Партии не найдены"
+    },
+    "activeOrders": {
+      "title": "Заказы в работе",
+      "currentMonth": "Текущий месяц",
+      "noCustomer": "Клиент не указан",
+      "empty": "Заказы не найдены"
+    },
+    "newCustomers": {
+      "title": "Новые клиенты",
+      "recentRegistrations": "Последние регистрации",
+      "noRegion": "Регион не указан",
+      "empty": "Клиенты не найдены"
+    },
+    "movements": {
+      "title": "Движения на складе",
+      "recentOperations": "Последние операции",
+      "empty": "Операции не найдены",
+      "types": {
+        "RECEIPT": "Приход",
+        "ISSUE": "Расход",
+        "RESERVE": "Резерв"
+      }
+    }
+  },
+  "forbidden": {
+    "title": "403 - Доступ запрещен",
+    "message": "У вас нет прав для просмотра этой страницы.",
+    "backHome": "На главную"
+  },
+  "scanner": {
+    "scanComplete": "Сканирование завершено!",
+    "scanAgain": "Сканировать снова",
+    "scanError": "Ошибка сканирования: {{message}}"
+  }
+}

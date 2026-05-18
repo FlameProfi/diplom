@@ -1,11 +1,13 @@
 import { Html5QrcodeScanner, Html5QrcodeSupportedFormats } from 'html5-qrcode'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import './BarcodeScanner.scss'
 interface BarcodeScannerProps {
   onScan: (result: string) => void;
 }
 
 const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
+  const { t } = useTranslation();
   const scannerRef = useRef<HTMLDivElement>(null);
   const scannerInstanceRef = useRef<Html5QrcodeScanner | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +42,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
       },
       (error: any) => {
         if (error && error !== 'No MultiFormat Readers were able to detect the code.') {
-          setError('Ошибка сканирования: ' + error);
+          setError(t('scanner.scanError', { message: error }));
           console.error(error);
         }
       }
@@ -77,8 +79,8 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
       />
       {!isScanning && (
         <div className="scan-complete">
-          <p>Сканирование завершено!</p>
-          <button onClick={restartScan}>Сканировать снова</button>
+          <p>{t('scanner.scanComplete')}</p>
+          <button onClick={restartScan}>{t('scanner.scanAgain')}</button>
         </div>
       )}
     </div>

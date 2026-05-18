@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import BarcodeScanner from '../../components/ScannerComponent/BarcodeScanner'
 import { useAuth } from '../../context/AuthContext'
 import api from '../../services/api'
@@ -105,6 +106,7 @@ type MovementSummary = {
 const WarehousePage = () => {
   const { user, logout } = useAuth()
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   const [activeTab, setActiveTab] = useState<TabKey>('scan')
   const [barcode, setBarcode] = useState('')
@@ -123,12 +125,12 @@ const WarehousePage = () => {
   const isAdmin = !!user && hasPermission(user.role, [Role.ADMIN, Role.MANAGER])
 
   const tabs = [
-    { key: 'scan', label: 'Сканер', adminOnly: false },
-    { key: 'stock', label: 'Остатки', adminOnly: false },
-    { key: 'reserve', label: 'Резерв', adminOnly: false },
-    { key: 'notifications', label: 'Уведомления', adminOnly: false },
-    { key: 'overview', label: 'Обзор', adminOnly: true },
-    { key: 'movements', label: 'Движения', adminOnly: true },
+    { key: 'scan', label: t('warehouse.tabs.scan'), adminOnly: false },
+    { key: 'stock', label: t('warehouse.tabs.stock'), adminOnly: false },
+    { key: 'reserve', label: t('warehouse.tabs.reserve'), adminOnly: false },
+    { key: 'notifications', label: t('warehouse.tabs.notifications'), adminOnly: false },
+    { key: 'overview', label: t('warehouse.tabs.overview'), adminOnly: true },
+    { key: 'movements', label: t('warehouse.tabs.movements'), adminOnly: true },
   ]
 
   const visibleTabs = tabs.filter((tab) => (tab.adminOnly ? isAdmin : true))
@@ -296,21 +298,21 @@ const WarehousePage = () => {
       queryClient.invalidateQueries({ queryKey: ['inventory-movements'] })
       setQuantity(0)
       setMovementReason('')
-      alert('Движение успешно создано!')
+      alert(t('warehouse.scan.movementSuccess'))
     },
     onError: (error: any) => {
       if (error.response?.status === 401) {
-        alert('Сессия истекла. Перезайдите в систему.')
+        alert(t('warehouse.scan.sessionExpired'))
         localStorage.removeItem('accessToken')
         logout()
         window.location.href = '/login'
         return
       }
       if (error.response?.status === 403) {
-        alert('Недостаточно прав для выполнения операции.')
+        alert(t('warehouse.scan.forbidden'))
         return
       }
-      alert(`Ошибка создания движения: ${error.response?.data?.message || error.message}`)
+      alert(t('warehouse.scan.createError', { message: error.response?.data?.message || error.message }))
     },
     onMutate: () => {
       setIsLoading(true)
@@ -336,21 +338,21 @@ const WarehousePage = () => {
       queryClient.invalidateQueries({ queryKey: ['inventory-movements'] })
       setQuantity(0)
       setOrderItemId('')
-      alert('Резерв успешно создан!')
+      alert(t('warehouse.reserve.reserveSuccess'))
     },
     onError: (error: any) => {
       if (error.response?.status === 401) {
-        alert('Сессия истекла. Перезайдите в систему.')
+        alert(t('warehouse.scan.sessionExpired'))
         localStorage.removeItem('accessToken')
         logout()
         window.location.href = '/login'
         return
       }
       if (error.response?.status === 403) {
-        alert('Недостаточно прав для создания резерва.')
+        alert(t('warehouse.reserve.forbidden'))
         return
       }
-      alert(`Ошибка резерва: ${error.response?.data?.message || error.message}`)
+      alert(t('warehouse.reserve.error', { message: error.response?.data?.message || error.message }))
     },
     onMutate: () => {
       setIsLoading(true)
@@ -362,7 +364,7 @@ const WarehousePage = () => {
 
   const handleScan = (scanned: string) => {
     if (!user) {
-      alert('Пожалуйста, авторизуйтесь для работы с системой')
+      alert(t('warehouse.scan.authPrompt'))
       return
     }
     setManualBatch(null)
@@ -373,11 +375,11 @@ const WarehousePage = () => {
 
   const handleManualSearch = () => {
     if (!user) {
-      alert('Пожалуйста, авторизуйтесь для работы с системой')
+      alert(t('warehouse.scan.authPrompt'))
       return
     }
     if (!manualInput.trim()) {
-      alert('Введите баркод для поиска')
+      alert(t('warehouse.scan.manualInput')) // A bit weird reuse, maybe should have separate key
       return
     }
     setManualBatch(null)
@@ -399,22 +401,22 @@ const WarehousePage = () => {
 
   const handleMovement = () => {
     if (!user) {
-      alert('Пожалуйста, авторизуйтесь для работы с системой')
+      alert(t('warehouse.scan.authPrompt'))
       return
     }
 
     if (!resolvedBatch) {
-      alert('Сначала отсканируйте или найдите партию')
+      alert(t('warehouse.scan.scanRequired'))
       return
     }
 
     if (quantity <= 0) {
-      alert('Введите количество больше 0')
+      alert(t('warehouse.scan.quantityRequired'))
       return
     }
 
     if (movementType === 'ISSUE' && quantity > availableQuantity) {
-      alert(`Недостаточно доступного товара. Доступно: ${availableQuantity}`)
+      alert(t('warehouse.scan.insufficientStock', { count: availableQuantity }))
       return
     }
 
@@ -437,27 +439,27 @@ const WarehousePage = () => {
 
   const handleReserve = () => {
     if (!user) {
-      alert('Пожалуйста, авторизуйтесь для работы с системой')
+      alert(t('warehouse.scan.authPrompt'))
       return
     }
 
     if (!resolvedBatch) {
-      alert('Сначала отсканируйте партию для резерва')
+      alert(t('warehouse.reserve.scanFirst'))
       return
     }
 
     if (!orderItemId) {
-      alert('Выберите позицию заказа')
+      alert(t('warehouse.reserve.selectOrderItem'))
       return
     }
 
     if (quantity <= 0) {
-      alert('Введите количество больше 0')
+      alert(t('warehouse.scan.quantityRequired'))
       return
     }
 
     if (quantity > availableQuantity) {
-      alert(`Недостаточно товара для резерва. Доступно: ${availableQuantity}`)
+      alert(t('warehouse.scan.insufficientStock', { count: availableQuantity }))
       return
     }
 
@@ -489,10 +491,10 @@ const WarehousePage = () => {
     return (
       <div className="warehouse-page">
         <div className="auth-required">
-          <h2>Доступ ограничен</h2>
-          <p>Для работы с складом необходимо авторизоваться</p>
+          <h2>{t('warehouse.accessDenied')}</h2>
+          <p>{t('warehouse.authRequired')}</p>
           <button onClick={() => (window.location.href = '/login')} className="login-btn">
-            Войти в систему
+            {t('warehouse.login')}
           </button>
         </div>
       </div>
@@ -503,17 +505,17 @@ const WarehousePage = () => {
     <div className="warehouse-page">
       <div className="warehouse-header">
         <div>
-          <h2>Панель склада</h2>
+          <h2>{t('warehouse.title')}</h2>
           <p className="subtitle">
-            {user.email} • роль: {user.role}
+            {user.email} • {t('warehouse.scan.status')}: {user.role}
           </p>
         </div>
         <div className="header-actions">
           <button className="ghost" onClick={handleResetBatch}>
-            Сбросить партию
+            {t('warehouse.resetBatch')}
           </button>
           <button className="danger" onClick={handleLogout}>
-            Выйти
+            {t('warehouse.logout')}
           </button>
         </div>
       </div>
@@ -539,29 +541,29 @@ const WarehousePage = () => {
                 type="text"
                 value={manualInput}
                 onChange={(e) => setManualInput(e.target.value)}
-                placeholder="Баркод вручную"
+                placeholder={t('warehouse.scan.manualInput')}
               />
-              <button onClick={handleManualSearch}>Найти</button>
+              <button onClick={handleManualSearch}>{t('warehouse.scan.find')}</button>
             </div>
-            {batchFetching && <p className="muted">Идет поиск партии...</p>}
-            {batchError && <p className="error">Ошибка поиска партии: {batchError.message}</p>}
+            {batchFetching && <p className="muted">{t('warehouse.scan.searching')}</p>}
+            {batchError && <p className="error">{t('warehouse.scan.searchError', { message: batchError.message })}</p>}
           </div>
 
           <div className="batch-card">
-            <h3>Партия</h3>
+            <h3>{t('warehouse.scan.batchTitle')}</h3>
             {resolvedBatch ? (
               <>
-                <p>Номер: {resolvedBatch.batchNumber}</p>
-                <p>Тип: {resolvedBatch.productType?.name ?? '—'}</p>
+                <p>{t('warehouse.scan.number')}: {resolvedBatch.batchNumber}</p>
+                <p>{t('warehouse.scan.type')}: {resolvedBatch.productType?.name ?? '—'}</p>
                 <p>
-                  Остаток: {resolvedBatch.quantity} {resolvedBatch.unit}
+                  {t('warehouse.scan.quantity')}: {resolvedBatch.quantity} {resolvedBatch.unit}
                 </p>
-                <p>Резерв: {totalReserved}</p>
+                <p>{t('warehouse.scan.reserve')}: {totalReserved}</p>
                 <p>
-                  Доступно: {availableQuantity} {resolvedBatch.unit}
+                  {t('warehouse.scan.available')}: {availableQuantity} {resolvedBatch.unit}
                 </p>
                 <p>
-                  Статус:{' '}
+                  {t('warehouse.scan.status')}:{' '}
                   <span className={`status-badge status-${resolvedBatch.status.toLowerCase()}`}>
                     {resolvedBatch.status}
                   </span>
@@ -580,31 +582,31 @@ const WarehousePage = () => {
                 )}
               </>
             ) : (
-              <p className="muted">Отсканируйте партию, чтобы увидеть детали.</p>
+              <p className="muted">{t('warehouse.scan.scanPrompt')}</p>
             )}
           </div>
 
           <div className="movement-card">
-            <h3>Операция</h3>
+            <h3>{t('warehouse.scan.operationTitle')}</h3>
             <div className="movement-form">
               <label>
-                Тип операции
+                {t('warehouse.scan.opType')}
                 <select
                   value={movementType}
                   onChange={(e) => setMovementType(e.target.value as 'RECEIPT' | 'ISSUE' | 'RESERVE')}
                 >
-                  <option value="RECEIPT">Приёмка</option>
-                  <option value="ISSUE">Отпуск</option>
-                  <option value="RESERVE">Резерв</option>
+                  <option value="RECEIPT">{t('warehouse.scan.receipt')}</option>
+                  <option value="ISSUE">{t('warehouse.scan.issue')}</option>
+                  <option value="RESERVE">{t('warehouse.scan.reserveOp')}</option>
                 </select>
               </label>
               <label>
-                Склад
+                {t('warehouse.scan.warehouse')}
                 <select
                   value={selectedWarehouseId}
                   onChange={(e) => setSelectedWarehouseId(e.target.value)}
                 >
-                  <option value="">По умолчанию</option>
+                  <option value="">{t('warehouse.scan.defaultWarehouse')}</option>
                   {warehouses?.map((wh) => (
                     <option key={wh.id} value={wh.id}>
                       {wh.name}
@@ -613,31 +615,31 @@ const WarehousePage = () => {
                 </select>
               </label>
               <label>
-                Количество
+                {t('warehouse.scan.quantityLabel')}
                 <input
                   type="number"
                   value={quantity}
                   onChange={(e) => setQuantity(Number(e.target.value))}
                   min="0"
-                  placeholder="Количество"
+                  placeholder={t('warehouse.scan.quantityPlaceholder')}
                 />
               </label>
               <label>
-                Причина
+                {t('warehouse.scan.reason')}
                 <textarea
                   value={movementReason}
                   onChange={(e) => setMovementReason(e.target.value)}
-                  placeholder="Комментарий к операции"
+                  placeholder={t('warehouse.scan.reasonPlaceholder')}
                 />
               </label>
               <button
                 onClick={handleMovement}
                 disabled={createMovementMutation.isPending || quantity <= 0 || !resolvedBatch}
               >
-                {createMovementMutation.isPending ? 'Сохранение...' : 'Выполнить'}
+                {createMovementMutation.isPending ? t('warehouse.scan.saving') : t('warehouse.scan.submit')}
               </button>
-              {warehouseError && <p className="error">Ошибка загрузки складов: {warehouseError.message}</p>}
-              {warehouseFetching && <p className="muted">Загружаем список складов...</p>}
+              {warehouseError && <p className="error">{t('warehouse.scan.loadWarehousesError', { message: warehouseError.message })}</p>}
+              {warehouseFetching && <p className="muted">{t('warehouse.scan.loadingWarehouses')}</p>}
             </div>
           </div>
         </div>
@@ -648,7 +650,7 @@ const WarehousePage = () => {
           <div className="stock-filters">
             <input
               type="text"
-              placeholder="Поиск по партии или складу"
+              placeholder={t('warehouse.stock.searchPlaceholder')}
               value={stockSearch}
               onChange={(e) => setStockSearch(e.target.value)}
             />
@@ -656,7 +658,7 @@ const WarehousePage = () => {
               value={stockWarehouseFilter}
               onChange={(e) => setStockWarehouseFilter(e.target.value)}
             >
-              <option value="">Все склады</option>
+              <option value="">{t('warehouse.stock.allWarehouses')}</option>
               {warehouses?.map((wh) => (
                 <option key={wh.id} value={wh.id}>
                   {wh.name}
@@ -664,17 +666,17 @@ const WarehousePage = () => {
               ))}
             </select>
           </div>
-          {stockFetching && <p className="muted">Загружаем остатки...</p>}
-          {stockError && <p className="error">Ошибка загрузки остатков: {stockError.message}</p>}
+          {stockFetching && <p className="muted">{t('warehouse.stock.loading')}</p>}
+          {stockError && <p className="error">{t('warehouse.stock.error', { message: stockError.message })}</p>}
           {filteredStock && filteredStock.length > 0 ? (
             <table>
               <thead>
                 <tr>
-                  <th>Партия</th>
-                  <th>Склад</th>
-                  <th>Остаток</th>
-                  <th>Резерв</th>
-                  <th>Доступно</th>
+                  <th>{t('warehouse.stock.table.batch')}</th>
+                  <th>{t('warehouse.stock.table.warehouse')}</th>
+                  <th>{t('warehouse.stock.table.quantity')}</th>
+                  <th>{t('warehouse.stock.table.reserve')}</th>
+                  <th>{t('warehouse.stock.table.available')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -692,29 +694,28 @@ const WarehousePage = () => {
               </tbody>
             </table>
           ) : (
-            <p>Остатки не найдены. Запустите seed или добавьте данные.</p>
+            <p>{t('warehouse.stock.empty')}</p>
           )}
         </div>
       )}
 
       {activeTab === 'reserve' && (
         <div className="reserve-section">
-          <h3>Резерв под заказы</h3>
-          {ordersFetching && <p className="muted">Загружаем заказы...</p>}
-          {ordersError && <p className="error">Ошибка загрузки заказов: {ordersError.message}</p>}
+          <h3>{t('warehouse.reserve.title')}</h3>
+          {ordersFetching && <p className="muted">{t('warehouse.reserve.loadingOrders')}</p>}
+          {ordersError && <p className="error">{t('warehouse.reserve.errorOrders', { message: ordersError.message })}</p>}
           {resolvedBatch ? (
             <div className="reserve-form">
               <p>
-                Партия для резерва: {resolvedBatch.batchNumber} (доступно: {availableQuantity}{' '}
-                {resolvedBatch.unit})
+                {t('warehouse.reserve.batchPrompt', { number: resolvedBatch.batchNumber, count: availableQuantity, unit: resolvedBatch.unit })}
               </p>
               <label>
-                Позиция заказа
+                {t('warehouse.reserve.orderItem')}
                 <select
                   value={orderItemId}
                   onChange={(e) => setOrderItemId(e.target.value)}
                 >
-                  <option value="">Выберите позицию заказа</option>
+                  <option value="">{t('warehouse.reserve.selectOrderItem')}</option>
                   {reserveOrderItems.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.orderNumber} • {item.batchNumber} • {item.quantity} ед. • {item.customerName}
@@ -724,32 +725,32 @@ const WarehousePage = () => {
               </label>
               {reserveOrderItems.length === 0 && (
                 <p className="muted">
-                  Для этой партии нет заказов. Проверьте список заказов или выберите другую партию.
+                  {t('warehouse.reserve.noOrdersForBatch')}
                 </p>
               )}
               <label>
-                Количество для резерва
+                {t('warehouse.reserve.quantityForReserve')}
                 <input
                   type="number"
                   value={quantity}
                   onChange={(e) => setQuantity(Number(e.target.value))}
                   min="0"
-                  placeholder="Количество"
+                  placeholder={t('warehouse.scan.quantityPlaceholder')}
                 />
               </label>
               <button
                 onClick={handleReserve}
                 disabled={reserveMutation.isPending || quantity <= 0 || !orderItemId}
               >
-                {reserveMutation.isPending ? 'Резервирование...' : 'Зарезервировать'}
+                {reserveMutation.isPending ? t('warehouse.reserve.reserving') : t('warehouse.reserve.reserveBtn')}
               </button>
             </div>
           ) : (
             <div className="reserve-empty">
-              <p>Сначала отсканируйте партию для резерва.</p>
+              <p>{t('warehouse.reserve.scanFirst')}</p>
               {orderItems.length > 0 && (
                 <div className="reserve-helper">
-                  <p className="muted">Либо выберите заказ и подтяните партию вручную:</p>
+                  <p className="muted">{t('warehouse.reserve.manualPrompt')}</p>
                   <select
                     value={orderItemId}
                     onChange={(e) => {
@@ -761,7 +762,7 @@ const WarehousePage = () => {
                       }
                     }}
                   >
-                    <option value="">Выберите заказ</option>
+                    <option value="">{t('warehouse.reserve.selectOrder')}</option>
                     {orderItems.map((item) => (
                       <option key={item.id} value={item.id}>
                         {item.orderNumber} • {item.batchNumber} • {item.quantity} ед. • {item.customerName}
@@ -777,9 +778,9 @@ const WarehousePage = () => {
 
       {activeTab === 'notifications' && (
         <div className="notifications-list">
-          <h3>Уведомления</h3>
-          {notifFetching && <p className="muted">Загружаем уведомления...</p>}
-          {notifError && <p className="error">Ошибка загрузки уведомлений: {notifError.message}</p>}
+          <h3>{t('warehouse.notifications.title')}</h3>
+          {notifFetching && <p className="muted">{t('warehouse.notifications.loading')}</p>}
+          {notifError && <p className="error">{t('warehouse.notifications.error', { message: notifError.message })}</p>}
           {notifications && notifications.length > 0 ? (
             <ul>
               {notifications.map((notification) => (
@@ -789,7 +790,7 @@ const WarehousePage = () => {
               ))}
             </ul>
           ) : (
-            <p>Уведомлений нет. Создайте движение для генерации (low stock).</p>
+            <p>{t('warehouse.notifications.empty')}</p>
           )}
         </div>
       )}
@@ -797,41 +798,41 @@ const WarehousePage = () => {
       {activeTab === 'overview' && (
         <div className="overview-grid">
           <div className="summary-card">
-            <h3>Сводка склада</h3>
+            <h3>{t('warehouse.overview.summary')}</h3>
             <div className="summary-metrics">
               <div>
-                <span>Всего</span>
+                <span>{t('warehouse.overview.total')}</span>
                 <strong>{totalStock}</strong>
               </div>
               <div>
-                <span>В резерве</span>
+                <span>{t('warehouse.overview.reserve')}</span>
                 <strong>{totalReservedStock}</strong>
               </div>
               <div>
-                <span>Доступно</span>
+                <span>{t('warehouse.overview.available')}</span>
                 <strong>{totalAvailableStock}</strong>
               </div>
             </div>
-            {stockFetching && <p className="muted">Загружаем сводку...</p>}
+            {stockFetching && <p className="muted">{t('warehouse.overview.loading')}</p>}
           </div>
           <div className="summary-card">
-            <h3>Активная партия</h3>
+            <h3>{t('warehouse.overview.activeBatch')}</h3>
             {resolvedBatch ? (
               <>
                 <p>{resolvedBatch.batchNumber}</p>
                 <p>
                   {resolvedBatch.quantity} {resolvedBatch.unit}
                 </p>
-                <p>Доступно: {availableQuantity}</p>
+                <p>{t('warehouse.overview.available')}: {availableQuantity}</p>
               </>
             ) : (
-              <p className="muted">Партия не выбрана.</p>
+              <p className="muted">{t('warehouse.overview.notSelected')}</p>
             )}
           </div>
           <div className="summary-card">
-            <h3>Текущий склад</h3>
-            <p>{warehouses?.find((wh) => wh.id === selectedWarehouseId)?.name ?? 'По умолчанию'}</p>
-            {warehouseError && <p className="error">Ошибка загрузки складов: {warehouseError.message}</p>}
+            <h3>{t('warehouse.overview.currentWarehouse')}</h3>
+            <p>{warehouses?.find((wh) => wh.id === selectedWarehouseId)?.name ?? t('warehouse.overview.default')}</p>
+            {warehouseError && <p className="error">{t('warehouse.overview.errorWarehouses', { message: warehouseError.message })}</p>}
           </div>
         </div>
       )}
@@ -841,27 +842,27 @@ const WarehousePage = () => {
           <div className="movements-toolbar">
             <input
               type="text"
-              placeholder="Поиск по партии, складу или пользователю"
+              placeholder={t('warehouse.movements.searchPlaceholder')}
               value={movementSearch}
               onChange={(e) => setMovementSearch(e.target.value)}
             />
             <button onClick={() => queryClient.invalidateQueries({ queryKey: ['inventory-movements'] })}>
-              Обновить
+              {t('warehouse.movements.refresh')}
             </button>
           </div>
-          {movementsFetching && <p className="muted">Загружаем движения...</p>}
-          {movementsError && <p className="error">Ошибка загрузки движений: {movementsError.message}</p>}
+          {movementsFetching && <p className="muted">{t('warehouse.movements.loading')}</p>}
+          {movementsError && <p className="error">{t('warehouse.movements.error', { message: movementsError.message })}</p>}
           {filteredMovements && filteredMovements.length > 0 ? (
             <table>
               <thead>
                 <tr>
-                  <th>Дата</th>
-                  <th>Партия</th>
-                  <th>Тип</th>
-                  <th>Количество</th>
-                  <th>Склад</th>
-                  <th>Пользователь</th>
-                  <th>Комментарий</th>
+                  <th>{t('warehouse.movements.table.date')}</th>
+                  <th>{t('warehouse.movements.table.batch')}</th>
+                  <th>{t('warehouse.movements.table.type')}</th>
+                  <th>{t('warehouse.movements.table.quantity')}</th>
+                  <th>{t('warehouse.movements.table.warehouse')}</th>
+                  <th>{t('warehouse.movements.table.user')}</th>
+                  <th>{t('warehouse.movements.table.comment')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -881,12 +882,12 @@ const WarehousePage = () => {
               </tbody>
             </table>
           ) : (
-            <p>Движений пока нет.</p>
+            <p>{t('warehouse.movements.empty')}</p>
           )}
         </div>
       )}
 
-      {isLoading && <div className="global-loading">Обработка...</div>}
+      {isLoading && <div className="global-loading">{t('warehouse.processing')}</div>}
     </div>
   )
 }
