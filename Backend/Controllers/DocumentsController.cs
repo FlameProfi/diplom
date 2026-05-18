@@ -3,11 +3,13 @@ using Backend.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "ADMIN,MANAGER,ACCOUNTANT")]
     [Produces("application/json")]
     public class DocumentsController : ControllerBase
     {

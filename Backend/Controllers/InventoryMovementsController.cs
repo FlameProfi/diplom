@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers
 {
     [Route("api/inventory-movements")]
     [ApiController]
+    [Authorize(Roles = "ADMIN,WAREHOUSE_WORKER,MANAGER,LOGIST")]
     [Produces("application/json")]
     public class InventoryMovementsController : ControllerBase
     {

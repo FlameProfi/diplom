@@ -1,7 +1,13 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import './AppLayout.css'
+import { useAuth } from '../../context/AuthContext'
+import { hasPermission, Role } from '../../utils/roles'
 
 const AppLayout = () => {
+  const { user } = useAuth();
+
+  if (!user) return null;
+
   return (
     <div className="app-shell">
       <aside className="app-sidebar">
@@ -13,18 +19,29 @@ const AppLayout = () => {
           <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             Обзор
           </NavLink>
-          <NavLink to="/warehouse" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-            Склад
-          </NavLink>
-          <NavLink to="/batches" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-            Партии
-          </NavLink>
-          <NavLink to="/orders" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-            Заказы
-          </NavLink>
-          <NavLink to="/customers" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-            Клиенты
-          </NavLink>
+
+          {hasPermission(user.role, [Role.ADMIN, Role.MANAGER, Role.LOGIST, Role.WAREHOUSE_WORKER]) && (
+            <>
+              <NavLink to="/warehouse" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+                Склад
+              </NavLink>
+              <NavLink to="/batches" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+                Партии
+              </NavLink>
+            </>
+          )}
+
+          {hasPermission(user.role, [Role.ADMIN, Role.MANAGER, Role.LOGIST, Role.ACCOUNTANT, Role.CLIENT]) && (
+            <NavLink to="/orders" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+              Заказы
+            </NavLink>
+          )}
+
+          {hasPermission(user.role, [Role.ADMIN, Role.MANAGER, Role.LOGIST, Role.ACCOUNTANT]) && (
+            <NavLink to="/customers" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+              Клиенты
+            </NavLink>
+          )}
         </nav>
         <div className="sidebar-footer">
           <span className="footer-label">Версия системы</span>

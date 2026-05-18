@@ -9,11 +9,13 @@ using Npgsql;
 using System.Data;
 using System.IO;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "ADMIN,WAREHOUSE_WORKER,MANAGER,LOGIST")]
     [Produces("application/json")]
     public class BatchesController : ControllerBase
     {

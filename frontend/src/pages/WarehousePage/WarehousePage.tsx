@@ -120,7 +120,7 @@ const WarehousePage = () => {
   const [manualBatch, setManualBatch] = useState<Batch | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const isAdmin = !!user && hasPermission(user.role as Role, Role.MANAGER)
+  const isAdmin = !!user && hasPermission(user.role, [Role.ADMIN, Role.MANAGER])
 
   const tabs = [
     { key: 'scan', label: 'Сканер', adminOnly: false },
