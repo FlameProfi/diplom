@@ -24,7 +24,7 @@ interface CreateOrderForm {
 }
 
 const OrdersPage = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const statusOptions = [
     { value: 'NEW', label: t('orders.statuses.NEW') },
