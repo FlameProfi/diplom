@@ -279,7 +279,7 @@ const BatchesPage = () => {
                 </td>
                 <td>
                   <span className={`status-badge status-${String(batch.status || 'unknown').toLowerCase()}`}>
-                    {getStatusText(batch.status || '')}
+                    {statusOptions.find((s) => s.value === batch.status)?.label || batch.status}
                   </span>
                 </td>
                 <td>
@@ -298,18 +298,5 @@ const BatchesPage = () => {
   );
 };
 
-// Вспомогательная функция
-const getStatusText = (status: string) => {
-  const { t } = useTranslation()
-  const map: Record<string, string> = {
-    DRAFT: t('batches.statuses.DRAFT'),
-    ACTIVE: t('batches.statuses.ACTIVE'),
-    QUARANTINE: t('batches.statuses.QUARANTINE'),
-    CERTIFIED: t('batches.statuses.CERTIFIED'),
-    SHIPPED: t('batches.statuses.SHIPPED'),
-    SCRAPPED: t('batches.statuses.SCRAPPED'),
-  };
-  return map[status] || status;
-};
 
 export default BatchesPage;
