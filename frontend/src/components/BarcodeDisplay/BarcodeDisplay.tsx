@@ -3,24 +3,25 @@ import { useEffect, useRef } from 'react'
 
 interface BarcodeDisplayProps {
   code: string;
+  displayValue?: boolean;
 }
 
-const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({ code }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({ code, displayValue = false }) => {
+  const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    if (canvasRef.current && code) {
-      JsBarcode(canvasRef.current, code, {
+    if (svgRef.current && code) {
+      JsBarcode(svgRef.current, code, {
         format: 'CODE128',
         width: 2,
         height: 40,
-        displayValue: false,
+        displayValue: displayValue,
         margin: 5,
       });
     }
-  }, [code]);
+  }, [code, displayValue]);
 
-  return <canvas ref={canvasRef} className="barcode-canvas" />;
+  return <svg ref={svgRef} className="barcode-canvas" />;
 };
 
 export default BarcodeDisplay;
