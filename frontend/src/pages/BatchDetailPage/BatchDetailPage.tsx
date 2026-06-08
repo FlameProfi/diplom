@@ -177,6 +177,7 @@ const BatchDetailPage: React.FC = () => {
       size,
       composition,
       batchNumber: batch?.batchNumber || '—',
+      barcode: batch?.barcode || '',
       productionDate: formatDateTime(batch?.productionDate || batch?.createdAt),
     }
   }, [batch, parsedParameters, t])
@@ -186,17 +187,19 @@ const BatchDetailPage: React.FC = () => {
 
     const printWindow = window.open('', '_blank', 'width=900,height=700')
     if (!printWindow) {
-      alert('Не удалось открыть окно печати. Разрешите всплывающие окна.')
+      alert(t('batchDetail.label.printWindowError'))
       return
     }
 
     const printableStyles = `
       <style>
-        body { font-family: Arial, sans-serif; margin: 24px; }
-        .label-card { border: 2px solid #111827; border-radius: 10px; padding: 20px; max-width: 520px; }
-        .label-title { margin: 0 0 16px; font-size: 22px; }
-        .label-row { margin-bottom: 8px; font-size: 16px; }
-        .label-row strong { display: inline-block; min-width: 150px; }
+        body { font-family: Arial, sans-serif; margin: 24px; display: flex; justify-content: center; }
+        .label-card { border: 2px solid #111827; border-radius: 10px; padding: 30px; width: 500px; }
+        .label-title { margin: 0 0 20px; font-size: 24px; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .label-row { margin-bottom: 12px; font-size: 18px; line-height: 1.4; }
+        .label-row strong { display: inline-block; min-width: 160px; color: #4b5563; }
+        .barcode-wrapper { margin-top: 25px; text-align: center; border-top: 1px dashed #ccc; padding-top: 20px; }
+        .barcode-wrapper svg { max-width: 100%; height: auto; }
       </style>
     `
 
@@ -208,13 +211,18 @@ const BatchDetailPage: React.FC = () => {
         </head>
         <body>
           ${labelPrintRef.current.outerHTML}
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+                window.close();
+              }, 300);
+            };
+          </script>
         </body>
       </html>
     `)
     printWindow.document.close()
-    printWindow.focus()
-    printWindow.print()
-    printWindow.close()
   }
 
   if (isLoading) return <div className="loading">{t('batchDetail.loading')}</div>
@@ -323,6 +331,11 @@ const BatchDetailPage: React.FC = () => {
               <div className="label-row"><strong>{t('batchDetail.label.composition')}:</strong> {labelData.composition}</div>
               <div className="label-row"><strong>{t('batchDetail.fields.number')}:</strong> {labelData.batchNumber}</div>
               <div className="label-row"><strong>{t('batchDetail.label.productionDate')}:</strong> {labelData.productionDate}</div>
+              {labelData.barcode && (
+                <div className="barcode-wrapper">
+                  <BarcodeDisplay code={labelData.barcode} displayValue={true} />
+                </div>
+              )}
             </div>
           </div>
           <button type="button" className="print-label-btn" onClick={handlePrintLabel}>

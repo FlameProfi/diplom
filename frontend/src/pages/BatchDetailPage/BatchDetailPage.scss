@@ -271,6 +271,21 @@ $accent-info: #17a2b8;
       }
     }
 
+    .barcode-wrapper {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px dashed $border-dark;
+      text-align: center;
+
+      svg {
+        max-width: 100%;
+        height: auto;
+        background: white;
+        padding: 5px;
+        border-radius: 4px;
+      }
+    }
+
     .print-label-btn {
       background: $accent-primary;
       color: #fff;
