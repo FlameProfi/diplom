@@ -44,6 +44,20 @@ const OrdersPage = () => {
   const currentDate = new Date().toISOString().split('T')[0]
   const customerIdParam = searchParams.get('customerId')
 
+  useEffect(() => {
+    if (searchParams.get('create') === 'true') {
+      setShowForm(true)
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev)
+          next.delete('create')
+          return next
+        },
+        { replace: true },
+      )
+    }
+  }, [searchParams, setSearchParams])
+
   const { data: orders = [], isLoading: ordersLoading, error: ordersError } = useQuery({
     queryKey: ['orders', customerIdParam],
     queryFn: async () => {

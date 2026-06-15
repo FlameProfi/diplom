@@ -12,6 +12,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
   const scannerInstanceRef = useRef<Html5QrcodeScanner | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(true);
+  const [scanKey, setScanKey] = useState(0);
 
   useEffect(() => {
     if (!scannerRef.current) return;
@@ -56,20 +57,27 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
         scannerInstanceRef.current.clear();
       }
     };
-  }, [onScan]);
+  }, [onScan, scanKey]);
 
   const restartScan = () => {
-    setIsScanning(true);
     setError(null);
     if (scannerInstanceRef.current) {
-      scannerInstanceRef.current.clear();
-      // Перезапуск через remount (или key prop)
-      window.location.reload();  // Простой способ
+      scannerInstanceRef.current.clear().then(() => {
+        setScanKey(prev => prev + 1);
+        setIsScanning(true);
+      }).catch(err => {
+        console.error("Failed to clear scanner", err);
+        setScanKey(prev => prev + 1);
+        setIsScanning(true);
+      });
+    } else {
+      setScanKey(prev => prev + 1);
+      setIsScanning(true);
     }
   };
 
   return (
-    <div className="barcode-scanner">
+    <div className="barcode-scanner" key={scanKey}>
       {error && <div className="error">{error}</div>}
       <div
         id="scanner-container"
