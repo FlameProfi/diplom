@@ -1,10 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { Link, useNavigate } from 'react-router-dom'
 import api from '../../services/api'
 import './DashboardPage.scss'
 
 const DashboardPage = () => {
   const { t, i18n } = useTranslation()
+  const navigate = useNavigate()
   const { data: batches = [], isLoading: batchesLoading, error: batchesError } = useQuery({
     queryKey: ['dashboard', 'batches'],
     queryFn: async () => {
@@ -95,26 +97,26 @@ const DashboardPage = () => {
   return (
     <div className="dashboard-page">
       <section className="summary-grid">
-        <div className="summary-card">
+        <Link to="/batches" className="summary-card clickable">
           <p className="summary-label">{t('dashboard.metrics.totalBatches')}</p>
           <h2>{batches.length}</h2>
           <span className="summary-meta">{t('dashboard.metrics.activeBatches', { count: activeBatches })}</span>
-        </div>
-        <div className="summary-card">
+        </Link>
+        <Link to="/warehouse" className="summary-card clickable">
           <p className="summary-label">{t('dashboard.metrics.warehouseStock')}</p>
           <h2>{totalStock.toFixed(1)}</h2>
           <span className="summary-meta">{t('dashboard.metrics.inReserve', { count: reservedStock.toFixed(1) })}</span>
-        </div>
-        <div className="summary-card">
+        </Link>
+        <Link to="/orders" className="summary-card clickable">
           <p className="summary-label">{t('dashboard.metrics.orders')}</p>
           <h2>{orders.length}</h2>
           <span className="summary-meta">{t('dashboard.metrics.newOrders', { count: pendingOrders })}</span>
-        </div>
-        <div className="summary-card">
+        </Link>
+        <Link to="/customers" className="summary-card clickable">
           <p className="summary-label">{t('dashboard.metrics.customers')}</p>
           <h2>{customers.length}</h2>
           <span className="summary-meta">{t('dashboard.metrics.activeContracts', { count: activeContracts })}</span>
-        </div>
+        </Link>
         <div className="summary-card">
           <p className="summary-label">{t('dashboard.metrics.contracts')}</p>
           <h2>{contracts.length}</h2>
@@ -130,7 +132,7 @@ const DashboardPage = () => {
           </div>
           <div className="panel-body">
             {batches.slice(0, 5).map((batch: any) => (
-              <div key={batch.id} className="panel-row">
+              <div key={batch.id} className="panel-row clickable" onClick={() => navigate(`/batches/${batch.id}`)}>
                 <div>
                   <p className="row-title">{batch.batchNumber}</p>
                   <span className="row-subtitle">{batch.productType?.name || batch.productTypeName || t('dashboard.recentBatches.noType')}</span>
@@ -151,7 +153,7 @@ const DashboardPage = () => {
           </div>
           <div className="panel-body">
             {orders.slice(0, 5).map((order: any) => (
-              <div key={order.id} className="panel-row">
+              <div key={order.id} className="panel-row clickable" onClick={() => navigate(`/orders?search=${order.orderNumber}`)}>
                 <div>
                   <p className="row-title">{order.orderNumber}</p>
                   <span className="row-subtitle">{order.customerName || t('dashboard.activeOrders.noCustomer')}</span>
@@ -172,7 +174,7 @@ const DashboardPage = () => {
           </div>
           <div className="panel-body">
             {recentCustomers.map((customer: any) => (
-              <div key={customer.id} className="panel-row">
+              <div key={customer.id} className="panel-row clickable" onClick={() => navigate(`/customers?search=${customer.name}`)}>
                 <div>
                   <p className="row-title">{customer.name}</p>
                   <span className="row-subtitle">
@@ -199,7 +201,7 @@ const DashboardPage = () => {
               const unit = relatedBatch?.unit || relatedBatch?.productType?.unit
               const typeKey = String(movement.type || '').toUpperCase()
               return (
-                <div key={movement.id} className="panel-row">
+                <div key={movement.id} className="panel-row clickable" onClick={() => navigate(`/batches/${movement.batchId}`)}>
                   <div>
                     <p className="row-title">{relatedBatch?.batchNumber || movement.batchId}</p>
                     <span className="row-subtitle">

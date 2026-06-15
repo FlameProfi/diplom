@@ -7,7 +7,7 @@ import api from '../../services/api'
 import { hasPermission, Role } from '../../utils/roles'
 import './WarehousePage.scss'
 
-type TabKey = 'scan' | 'stock' | 'reserve' | 'notifications' | 'movements' | 'overview'
+type TabKey = 'scan' | 'stock' | 'reserve' | 'notifications' | 'movements' | 'overview' | 'manage'
 
 type Warehouse = {
   id: string
@@ -122,6 +122,11 @@ const WarehousePage = () => {
   const [manualBatch, setManualBatch] = useState<Batch | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
+  const [editingWarehouse, setEditingWarehouse] = useState<Warehouse | null>(null)
+  const [whName, setWhName] = useState('')
+  const [whType, setWhType] = useState('MAIN')
+  const [whLocation, setWhLocation] = useState('')
+
   const isAdmin = !!user && hasPermission(user.role, [Role.ADMIN, Role.MANAGER])
 
   const tabs = [
@@ -131,6 +136,7 @@ const WarehousePage = () => {
     { key: 'notifications', label: t('warehouse.tabs.notifications'), adminOnly: false },
     { key: 'overview', label: t('warehouse.tabs.overview'), adminOnly: true },
     { key: 'movements', label: t('warehouse.tabs.movements'), adminOnly: true },
+    { key: 'manage', label: t('warehouse.tabs.manage'), adminOnly: true },
   ]
 
   const visibleTabs = tabs.filter((tab) => (tab.adminOnly ? isAdmin : true))
@@ -321,6 +327,61 @@ const WarehousePage = () => {
       setIsLoading(false)
     },
   })
+
+  const createWhMutation = useMutation({
+    mutationFn: (data: Partial<Warehouse>) => api.post('/warehouses', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['warehouses'] })
+      setWhName('')
+      setWhLocation('')
+      setWhType('MAIN')
+    },
+    onError: (err: any) => alert(t('warehouse.manage.createError', { message: err.message })),
+  })
+
+  const updateWhMutation = useMutation({
+    mutationFn: (data: Warehouse) => api.put(`/warehouses/${data.id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['warehouses'] })
+      setEditingWarehouse(null)
+      setWhName('')
+      setWhLocation('')
+      setWhType('MAIN')
+    },
+    onError: (err: any) => alert(t('warehouse.manage.updateError', { message: err.message })),
+  })
+
+  const deleteWhMutation = useMutation({
+    mutationFn: (id: string) => api.delete(`/warehouses/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['warehouses'] })
+    },
+    onError: (err: any) => alert(t('warehouse.manage.deleteError', { message: err.message })),
+  })
+
+  const handleSaveWarehouse = () => {
+    if (!whName.trim()) return
+    const data = { name: whName, type: whType, location: whLocation }
+    if (editingWarehouse) {
+      updateWhMutation.mutate({ ...editingWarehouse, ...data })
+    } else {
+      createWhMutation.mutate(data)
+    }
+  }
+
+  const handleEditWh = (wh: Warehouse) => {
+    setEditingWarehouse(wh)
+    setWhName(wh.name)
+    setWhType(wh.type || 'MAIN')
+    setWhLocation(wh.location || '')
+  }
+
+  const handleCancelWhEdit = () => {
+    setEditingWarehouse(null)
+    setWhName('')
+    setWhLocation('')
+    setWhType('MAIN')
+  }
 
   const reserveMutation = useMutation({
     mutationFn: async (data: {
@@ -833,6 +894,72 @@ const WarehousePage = () => {
             <h3>{t('warehouse.overview.currentWarehouse')}</h3>
             <p>{warehouses?.find((wh) => wh.id === selectedWarehouseId)?.name ?? t('warehouse.overview.default')}</p>
             {warehouseError && <p className="error">{t('warehouse.overview.errorWarehouses', { message: warehouseError.message })}</p>}
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'manage' && isAdmin && (
+        <div className="manage-warehouses">
+          <div className="wh-form-card">
+            <h3>{editingWarehouse ? t('warehouse.manage.editTitle') : t('warehouse.manage.createTitle')}</h3>
+            <div className="wh-form">
+              <label>
+                {t('warehouse.manage.nameLabel')}
+                <input value={whName} onChange={(e) => setWhName(e.target.value)} placeholder={t('warehouse.manage.namePlaceholder')} />
+              </label>
+              <label>
+                {t('warehouse.manage.typeLabel')}
+                <select value={whType} onChange={(e) => setWhType(e.target.value)}>
+                  <option value="MAIN">{t('warehouse.manage.types.MAIN')}</option>
+                  <option value="COLD">{t('warehouse.manage.types.COLD')}</option>
+                  <option value="OUTDOOR">{t('warehouse.manage.types.OUTDOOR')}</option>
+                  <option value="TRANSIT">{t('warehouse.manage.types.TRANSIT')}</option>
+                </select>
+              </label>
+              <label>
+                {t('warehouse.manage.locationLabel')}
+                <input value={whLocation} onChange={(e) => setWhLocation(e.target.value)} placeholder={t('warehouse.manage.locationPlaceholder')} />
+              </label>
+              <div className="wh-form-actions">
+                <button onClick={handleSaveWarehouse} disabled={createWhMutation.isPending || updateWhMutation.isPending}>
+                  {editingWarehouse ? t('warehouse.manage.save') : t('warehouse.manage.create')}
+                </button>
+                {editingWarehouse && (
+                  <button className="ghost" onClick={handleCancelWhEdit}>
+                    {t('warehouse.manage.cancel')}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="wh-list-card">
+            <h3>{t('warehouse.manage.listTitle')}</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>{t('warehouse.manage.table.name')}</th>
+                  <th>{t('warehouse.manage.table.type')}</th>
+                  <th>{t('warehouse.manage.table.location')}</th>
+                  <th>{t('warehouse.manage.table.actions')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {warehouses?.map((wh) => (
+                  <tr key={wh.id}>
+                    <td>{wh.name}</td>
+                    <td>{wh.type}</td>
+                    <td>{wh.location || '—'}</td>
+                    <td>
+                      <button className="btn btn-sm" onClick={() => handleEditWh(wh)}>{t('warehouse.manage.edit')}</button>
+                      <button className="btn btn-sm btn-danger" onClick={() => { if (confirm(t('warehouse.manage.deleteConfirm'))) deleteWhMutation.mutate(wh.id) }}>
+                        {t('warehouse.manage.delete')}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}

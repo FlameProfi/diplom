@@ -24,6 +24,9 @@
     "topbarSubtitle": "Production and warehouse data",
     "actions": {
       "export": "Export",
+      "exportUnavailable": "Export unavailable on this page",
+      "exportEmpty": "No data to export",
+      "exportError": "Error during export",
       "create": "Create Request"
     }
   },
@@ -101,7 +104,8 @@
       "reserve": "Reserve",
       "notifications": "Notifications",
       "overview": "Overview",
-      "movements": "Movements"
+      "movements": "Movements",
+      "manage": "Manage"
     },
     "scan": {
       "manualInput": "Barcode manually",
@@ -205,6 +209,37 @@
         "comment": "Comment"
       },
       "empty": "No movements yet."
+    },
+    "manage": {
+      "createTitle": "New Warehouse",
+      "editTitle": "Edit Warehouse",
+      "nameLabel": "Name",
+      "namePlaceholder": "Main Warehouse",
+      "typeLabel": "Type",
+      "types": {
+        "MAIN": "Main",
+        "COLD": "Cold",
+        "OUTDOOR": "Outdoor",
+        "TRANSIT": "Transit"
+      },
+      "locationLabel": "Location/Address",
+      "locationPlaceholder": "Building 1, A-12",
+      "create": "Create",
+      "save": "Save",
+      "cancel": "Cancel",
+      "listTitle": "Warehouse List",
+      "table": {
+        "name": "Name",
+        "type": "Type",
+        "location": "Location",
+        "actions": "Actions"
+      },
+      "edit": "Edit",
+      "delete": "Del",
+      "deleteConfirm": "Are you sure you want to delete this warehouse?",
+      "createError": "Error creating warehouse: {{message}}",
+      "updateError": "Error updating warehouse: {{message}}",
+      "deleteError": "Error deleting warehouse: {{message}}"
     },
     "processing": "Processing..."
   },

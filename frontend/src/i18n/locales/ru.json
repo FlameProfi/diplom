@@ -24,6 +24,9 @@
     "topbarSubtitle": "Данные по производству и складу",
     "actions": {
       "export": "Экспорт",
+      "exportUnavailable": "Экспорт невозможен на этой странице",
+      "exportEmpty": "Нет данных для экспорта",
+      "exportError": "Ошибка при экспорте",
       "create": "Создать заявку"
     }
   },
@@ -101,7 +104,8 @@
       "reserve": "Резерв",
       "notifications": "Уведомления",
       "overview": "Обзор",
-      "movements": "Движения"
+      "movements": "Движения",
+      "manage": "Управление"
     },
     "scan": {
       "manualInput": "Баркод вручную",
@@ -205,6 +209,37 @@
         "comment": "Комментарий"
       },
       "empty": "Движений пока нет."
+    },
+    "manage": {
+      "createTitle": "Новый склад",
+      "editTitle": "Редактировать склад",
+      "nameLabel": "Название",
+      "namePlaceholder": "Основной склад",
+      "typeLabel": "Тип",
+      "types": {
+        "MAIN": "Основной",
+        "COLD": "Холодный",
+        "OUTDOOR": "Уличный",
+        "TRANSIT": "Транзитный"
+      },
+      "locationLabel": "Локация/Адрес",
+      "locationPlaceholder": "Цех №1, Стеллаж A",
+      "create": "Создать",
+      "save": "Сохранить",
+      "cancel": "Отмена",
+      "listTitle": "Список складов",
+      "table": {
+        "name": "Название",
+        "type": "Тип",
+        "location": "Локация",
+        "actions": "Действия"
+      },
+      "edit": "Изм.",
+      "delete": "Удал.",
+      "deleteConfirm": "Вы уверены, что хотите удалить этот склад?",
+      "createError": "Ошибка создания склада: {{message}}",
+      "updateError": "Ошибка обновления склада: {{message}}",
+      "deleteError": "Ошибка удаления склада: {{message}}"
     },
     "processing": "Обработка..."
   },
