@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import api from '../../services/api'
+import { formatNumber } from '../../utils/format'
 import './DashboardPage.scss'
 
 const DashboardPage = () => {
@@ -104,8 +105,8 @@ const DashboardPage = () => {
         </Link>
         <Link to="/warehouse" className="summary-card clickable">
           <p className="summary-label">{t('dashboard.metrics.warehouseStock')}</p>
-          <h2>{totalStock.toFixed(1)}</h2>
-          <span className="summary-meta">{t('dashboard.metrics.inReserve', { count: reservedStock.toFixed(1) })}</span>
+          <h2>{formatNumber(totalStock, i18n.language)}</h2>
+          <span className="summary-meta">{t('dashboard.metrics.inReserve', { count: formatNumber(reservedStock, i18n.language) })}</span>
         </Link>
         <Link to="/orders" className="summary-card clickable">
           <p className="summary-label">{t('dashboard.metrics.orders')}</p>
@@ -209,7 +210,7 @@ const DashboardPage = () => {
                     </span>
                   </div>
                   <div className={`panel-tag tag-${typeKey.toLowerCase()}`}>
-                    {movement.quantity} {unit || ''}
+                    {formatNumber(movement.quantity, i18n.language)} {unit || ''}
                   </div>
                 </div>
               )

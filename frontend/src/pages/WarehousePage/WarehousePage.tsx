@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import BarcodeScanner from '../../components/ScannerComponent/BarcodeScanner'
 import { useAuth } from '../../context/AuthContext'
 import api from '../../services/api'
+import { formatNumber } from '../../utils/format'
 import { hasPermission, Role } from '../../utils/roles'
 import './WarehousePage.scss'
 
@@ -106,7 +107,7 @@ type MovementSummary = {
 const WarehousePage = () => {
   const { user, logout } = useAuth()
   const queryClient = useQueryClient()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const [activeTab, setActiveTab] = useState<TabKey>('scan')
   const [barcode, setBarcode] = useState('')
@@ -617,11 +618,11 @@ const WarehousePage = () => {
                 <p>{t('warehouse.scan.number')}: {resolvedBatch.batchNumber}</p>
                 <p>{t('warehouse.scan.type')}: {resolvedBatch.productType?.name ?? '—'}</p>
                 <p>
-                  {t('warehouse.scan.quantity')}: {resolvedBatch.quantity} {resolvedBatch.unit}
+                  {t('warehouse.scan.quantity')}: {formatNumber(resolvedBatch.quantity, i18n.language)} {resolvedBatch.unit}
                 </p>
-                <p>{t('warehouse.scan.reserve')}: {totalReserved}</p>
+                <p>{t('warehouse.scan.reserve')}: {formatNumber(totalReserved, i18n.language)}</p>
                 <p>
-                  {t('warehouse.scan.available')}: {availableQuantity} {resolvedBatch.unit}
+                  {t('warehouse.scan.available')}: {formatNumber(availableQuantity, i18n.language)} {resolvedBatch.unit}
                 </p>
                 <p>
                   {t('warehouse.scan.status')}:{' '}
@@ -635,7 +636,7 @@ const WarehousePage = () => {
                       <div key={item.id} className="stock-badge">
                         <span>{item.warehouseName ?? item.warehouse?.name ?? 'Склад'}</span>
                         <strong>
-                          {item.quantity} / {item.reserved}
+                          {formatNumber(item.quantity, i18n.language)} / {formatNumber(item.reserved, i18n.language)}
                         </strong>
                       </div>
                     ))}
@@ -746,10 +747,10 @@ const WarehousePage = () => {
                     <td>{item.batch.batchNumber}</td>
                     <td>{item.warehouse.name}</td>
                     <td>
-                      {item.quantity} {item.batch.unit}
+                      {formatNumber(item.quantity, i18n.language)} {item.batch.unit}
                     </td>
-                    <td>{item.reserved}</td>
-                    <td>{item.quantity - item.reserved}</td>
+                    <td>{formatNumber(item.reserved, i18n.language)}</td>
+                    <td>{formatNumber(item.quantity - item.reserved, i18n.language)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -863,15 +864,15 @@ const WarehousePage = () => {
             <div className="summary-metrics">
               <div>
                 <span>{t('warehouse.overview.total')}</span>
-                <strong>{totalStock}</strong>
+                <strong>{formatNumber(totalStock, i18n.language)}</strong>
               </div>
               <div>
                 <span>{t('warehouse.overview.reserve')}</span>
-                <strong>{totalReservedStock}</strong>
+                <strong>{formatNumber(totalReservedStock, i18n.language)}</strong>
               </div>
               <div>
                 <span>{t('warehouse.overview.available')}</span>
-                <strong>{totalAvailableStock}</strong>
+                <strong>{formatNumber(totalAvailableStock, i18n.language)}</strong>
               </div>
             </div>
             {stockFetching && <p className="muted">{t('warehouse.overview.loading')}</p>}
@@ -882,9 +883,9 @@ const WarehousePage = () => {
               <>
                 <p>{resolvedBatch.batchNumber}</p>
                 <p>
-                  {resolvedBatch.quantity} {resolvedBatch.unit}
+                  {formatNumber(resolvedBatch.quantity, i18n.language)} {resolvedBatch.unit}
                 </p>
-                <p>{t('warehouse.overview.available')}: {availableQuantity}</p>
+                <p>{t('warehouse.overview.available')}: {formatNumber(availableQuantity, i18n.language)}</p>
               </>
             ) : (
               <p className="muted">{t('warehouse.overview.notSelected')}</p>
@@ -998,7 +999,7 @@ const WarehousePage = () => {
                     <td>{new Date(movement.date).toLocaleString()}</td>
                     <td>{movement.batchNumber}</td>
                     <td>{movement.type}</td>
-                    <td>{movement.quantity}</td>
+                    <td>{formatNumber(movement.quantity, i18n.language)}</td>
                     <td>
                       {movement.fromWarehouseName || movement.toWarehouseName || '—'}
                     </td>
