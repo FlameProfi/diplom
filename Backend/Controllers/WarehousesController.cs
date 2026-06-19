@@ -1,5 +1,6 @@
 using Backend.Infrastructure;
 using Backend.Models;
+using Backend.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -44,8 +45,16 @@ namespace Backend.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult<Warehouse>> Create(Warehouse item)
+        public async Task<ActionResult<Warehouse>> Create(WarehouseCreateDto dto)
         {
+            var item = new Warehouse
+            {
+                Name = dto.Name,
+                Type = dto.Type,
+                Location = dto.Location,
+                Capacity = dto.Capacity
+            };
+
             EntityDefaults.ApplyCreationDefaults(item);
             _context.Warehouses.Add(item);
             await _context.SaveChangesAsync();
