@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import BarcodeDisplay from '../../components/BarcodeDisplay/BarcodeDisplay'
 import api from '../../services/api'
+import { formatNumber } from '../../utils/format'
 import './BatchDetailPage.scss'
 
 
@@ -305,15 +306,15 @@ const BatchDetailPage: React.FC = () => {
           <div className="summary-grid">
             <div className="summary-item">
               <label>{t('batchDetail.fields.total')}</label>
-              <div className="value">{summary.totalQuantity} {batch.unit}</div>
+              <div className="value">{formatNumber(summary.totalQuantity, i18n.language)} {batch.unit}</div>
             </div>
             <div className="summary-item">
               <label>{t('batchDetail.fields.reserved')}</label>
-              <div className="value">{summary.totalReserved} {batch.unit}</div>
+              <div className="value">{formatNumber(summary.totalReserved, i18n.language)} {batch.unit}</div>
             </div>
             <div className="summary-item">
               <label>{t('batchDetail.fields.available')}</label>
-              <div className="value">{summary.totalAvailable} {batch.unit}</div>
+              <div className="value">{formatNumber(summary.totalAvailable, i18n.language)} {batch.unit}</div>
             </div>
           </div>
         </section>
@@ -352,8 +353,8 @@ const BatchDetailPage: React.FC = () => {
                   <div>
                     <span className="movement-type">{movementLabels[movement.type] || movement.type}</span>
                     <span className="movement-details">
-                      {movement.quantity} {batch.unit} • {formatDateTime(movement.date)}
-                      {movement.reason && <div>{movement.reason}</div>}
+                      {formatNumber(movement.quantity, i18n.language)} {batch.unit} • {formatDateTime(movement.date)}
+                          {movement.reason && <div>{movement.reason}</div>}
                     </span>
                   </div>
                 </li>
@@ -387,9 +388,9 @@ const BatchDetailPage: React.FC = () => {
                         <td>{item.warehouse?.name || t('batchDetail.stock.unknownWarehouse')}</td>
                         <td>{item.warehouse?.type || '—'}</td>
                         <td>{item.warehouse?.location || '—'}</td>
-                        <td className="quantity-cell">{item.quantity} {batch.unit}</td>
-                        <td className="quantity-cell">{item.reserved} {batch.unit}</td>
-                        <td className="quantity-cell">{available} {batch.unit}</td>
+                        <td className="quantity-cell">{formatNumber(item.quantity, i18n.language)} {batch.unit}</td>
+                        <td className="quantity-cell">{formatNumber(item.reserved, i18n.language)} {batch.unit}</td>
+                        <td className="quantity-cell">{formatNumber(available, i18n.language)} {batch.unit}</td>
                       </tr>
                     )
                   })}
