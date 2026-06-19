@@ -50,8 +50,20 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Customer>> CreateCustomer(Customer customer)
+        public async Task<ActionResult<Customer>> CreateCustomer(CustomerCreateDto customerDto)
         {
+            var customer = new Customer
+            {
+                Name = customerDto.Name,
+                Email = customerDto.Email,
+                Phone = customerDto.Phone,
+                Region = customerDto.Region,
+                Country = customerDto.Country,
+                Address = customerDto.Address,
+                TaxId = customerDto.TaxId,
+                UserId = customerDto.UserId
+            };
+
             EntityDefaults.ApplyCreationDefaults(customer);
 
             _context.Customers.Add(customer);
