@@ -390,9 +390,11 @@
   },
   "customers": {
     "title": "Клиенты",
-    "stats": {
-      "total": "Всего: {{count}}",
-      "regions": "Регионов: {{count}}"
+    "subtitle": "Управление базой клиентов и контактными данными",
+    "summary": {
+      "total": "Всего клиентов",
+      "active": "С заказами",
+      "regions": "Регионов"
     },
     "actions": {
       "cancel": "Отмена",
