@@ -390,9 +390,11 @@
   },
   "customers": {
     "title": "Customers",
-    "stats": {
-      "total": "Total: {{count}}",
-      "regions": "Regions: {{count}}"
+    "subtitle": "Customer database and contact management",
+    "summary": {
+      "total": "Total Customers",
+      "active": "With Orders",
+      "regions": "Regions"
     },
     "actions": {
       "cancel": "Cancel",

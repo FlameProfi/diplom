@@ -53,6 +53,12 @@ const CustomersPage = () => {
     },
   });
 
+  const customerStats = useMemo(() => {
+    const activeCustomers = customers.filter(c => (c.ordersCount ?? 0) > 0).length;
+    const regionsCount = new Set(customers.map(c => c.region).filter(Boolean)).size;
+    return { activeCustomers, regionsCount };
+  }, [customers]);
+
   const createMutation = useMutation({
     mutationFn: (data: CreateCustomerForm) => api.post('/customers', data),
     onSuccess: () => {
@@ -93,10 +99,9 @@ const CustomersPage = () => {
   return (
     <div className="customers-page">
       <header className="page-header">
-        <h1>{t('customers.title')}</h1>
-        <div className="stats">
-          <span>{t('customers.stats.total', { count: customers.length })}</span>
-          <span>{t('customers.stats.regions', { count: new Set(customers.map((customer) => customer.region).filter(Boolean)).size })}</span>
+        <div>
+          <h1>{t('customers.title')}</h1>
+          <p className="subtitle">{t('customers.subtitle')}</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
@@ -106,6 +111,21 @@ const CustomersPage = () => {
           {showForm ? t('customers.actions.cancel') : t('customers.actions.new')}
         </button>
       </header>
+
+      <section className="summary">
+        <div className="summary-card">
+          <span className="label">{t('customers.summary.total')}</span>
+          <strong>{customers.length}</strong>
+        </div>
+        <div className="summary-card">
+          <span className="label">{t('customers.summary.active')}</span>
+          <strong>{customerStats.activeCustomers}</strong>
+        </div>
+        <div className="summary-card accent">
+          <span className="label">{t('customers.summary.regions')}</span>
+          <strong>{customerStats.regionsCount}</strong>
+        </div>
+      </section>
 
       {showForm && (
         <form onSubmit={handleSubmit(onSubmit)} className="customer-form">
@@ -139,15 +159,13 @@ const CustomersPage = () => {
               <input id="customer-tax" {...register('taxId')} placeholder={t('customers.form.taxIdPlaceholder')} />
             </div>
           </div>
-          <div className="form-actions">
-            <button type="submit" className="btn btn-success" disabled={createMutation.isPending}>
-              {createMutation.isPending ? t('customers.actions.creating') : t('customers.actions.create')}
-            </button>
-          </div>
+          <button type="submit" className="btn btn-success" disabled={createMutation.isPending}>
+            {createMutation.isPending ? t('customers.actions.creating') : t('customers.actions.create')}
+          </button>
         </form>
       )}
 
-      <div className="filters mb-4">
+      <div className="filters">
         <input
           type="text"
           value={searchTerm}
@@ -160,7 +178,7 @@ const CustomersPage = () => {
           value={searchRegion}
           onChange={(e) => setSearchRegion(e.target.value)}
           placeholder={t('customers.filters.regionPlaceholder')}
-          className="search-input"
+          className="region-filter"
         />
       </div>
 
